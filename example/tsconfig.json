@@ -1,6 +1,22 @@
 {
-  "extends": "../tsconfig",
+  "extends": "@react-native/typescript-config",
   "compilerOptions": {
-    // Avoid expo-cli auto-generating a tsconfig
-  }
+    "types": [
+      "jest"
+    ],
+    "paths": {
+      "react-native-nativewind-grid": [
+        "../src/index"
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "nativewind-env.d.ts"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/Pods"
+  ]
 }

@@ -1,16 +1,18 @@
 const path = require('path');
-const { getConfig } = require('react-native-builder-bob/babel-config');
-const pkg = require('../package.json');
+const pak = require('../package.json');
 
-const root = path.resolve(__dirname, '..');
-
-module.exports = function (api) {
-  api.cache(true);
-
-  return getConfig(
-    {
-      presets: ['babel-preset-expo'],
-    },
-    { root, pkg }
-  );
+module.exports = {
+  presets: ['module:@react-native/babel-preset', 'nativewind/babel'],
+  plugins: [
+    [
+      'module-resolver',
+      {
+        extensions: ['.tsx', '.ts', '.js', '.json'],
+        alias: {
+          [pak.name]: path.join(__dirname, '..', 'src'),
+        },
+      },
+    ],
+    'react-native-reanimated/plugin',
+  ],
 };
