@@ -185,9 +185,11 @@ export function GridDemo() {
 const Key = ({
   label,
   type,
+  style: styleProp,
 }: {
   label: string | number;
   type: 'num' | 'op' | 'func';
+  style?: any;
 }) => {
   let style = styles.key;
   let textStyle = styles.keyText;
@@ -200,16 +202,16 @@ const Key = ({
   }
 
   return (
-    <View style={style}>
+    <View style={[style, styleProp]}>
       <Text style={textStyle}>{label}</Text>
     </View>
   );
 };
 
-const ImagePlaceholder = ({ height, color, className, text }: any) => (
+const ImagePlaceholder = ({ height, color, className, text, style }: any) => (
   <View
     className={className}
-    style={[styles.imagePlace, { height, backgroundColor: color }]}
+    style={[styles.imagePlace, { height, backgroundColor: color }, style]}
   >
     <Text style={styles.imageText}>{text || 'Img'}</Text>
   </View>

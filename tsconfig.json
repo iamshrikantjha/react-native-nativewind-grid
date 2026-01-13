@@ -2,15 +2,21 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "react-native-nativewind-grid": ["./src/index"]
+      "react-native-nativewind-grid": [
+        "./src/index"
+      ]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
-    "customConditions": ["react-native-strict-api"],
+    "customConditions": [
+      "react-native-strict-api"
+    ],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx",
-    "lib": ["ESNext"],
+    "lib": [
+      "ESNext"
+    ],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "noEmit": true,
@@ -26,5 +32,15 @@
     "strict": true,
     "target": "ESNext",
     "verbatimModuleSyntax": true
-  }
+  },
+  "include": [
+    "src",
+    "plugin",
+    "nativewind-env.d.ts"
+  ],
+  "exclude": [
+    "example",
+    "node_modules",
+    "**/__tests__"
+  ]
 }
