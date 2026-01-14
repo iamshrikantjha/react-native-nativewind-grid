@@ -6,48 +6,40 @@ export function computeContainerStyle(spec: GridSpec): ViewStyle {
   const gapX = spec.gapX ?? gap;
   const gapY = spec.gapY ?? gap;
 
+  // With percentage widths, we still need negative margins on the container
+  // to offset the padding on items (which create the gaps).
   return {
     flexDirection: spec.autoFlow === 'column' ? 'column' : 'row',
     flexWrap: 'wrap',
-    // We use negative margin on the container to offset the padding on items
-    // This allows us to have perfect gaps without overflow issues
     marginHorizontal: -gapX / 2,
     marginVertical: -gapY / 2,
+    // We explicitly reset strict gap properties to 0 because NativeWind might
+    // translate 'gap-X' classes into native gap styles. We handle gaps manually via padding.
+    gap: 0,
+    rowGap: 0,
+    columnGap: 0,
   };
 }
 
 export function computeItemStyle(
   gridSpec: GridSpec,
-  itemSpec: ItemSpec,
-  containerWidth: number
+  itemSpec: ItemSpec
+  // Container width is no longer needed!
 ): ViewStyle {
-  // Defensive check for container width (e.g. init render)
-  if (!containerWidth || containerWidth <= 0) {
-    return { width: 0, height: 0, opacity: 0 };
-  }
-
   const gap = gridSpec.gap ?? 0;
   const gapX = gridSpec.gapX ?? gap;
   const gapY = gridSpec.gapY ?? gap;
 
   const cols = gridSpec.cols || 1;
+  const span = itemSpec.colSpan || 1;
 
-  // Basic column width calculation
-  // (Container Width / Cols) gives the visual slot size.
-  // BUT: Our container has negative margins, and items have padding.
-  // The 'effective' width available is the passed containerWidth (which ideally matches the parent's available width).
-  // Because we added negative margins to the container, the container is actually wider than the parent.
-  // However, useWindowDimensions().width is the screen width.
-  // If we are strictly passed the "available content width", we might need to adjust.
-  // For now, let's assume `containerWidth` is the full width the grid should inhabit.
-
-  // Since we use padding for gaps, the item width includes the gap space.
-  const columnWidth = containerWidth / cols;
-
-  const width = columnWidth * (itemSpec.colSpan || 1);
+  // Percentage width calculation
+  // 100% / cols * span
+  // Example: 3 cols, span 1 = 33.333%
+  const widthPercentage = (100 / cols) * span;
 
   return {
-    width: width as DimensionValue, // Explicit cast
+    width: `${widthPercentage}%` as DimensionValue,
     paddingHorizontal: gapX / 2,
     paddingVertical: gapY / 2,
   };

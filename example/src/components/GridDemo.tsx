@@ -42,7 +42,7 @@ export function GridDemo() {
           Complex spans using col-span & row-span
         </Text>
 
-        <Grid className="grid grid-cols-4 gap-4">
+        <Grid className="grid grid-cols-4 gap-3">
           {/* Large Main Stat */}
           <View
             className="col-span-2 row-span-2"

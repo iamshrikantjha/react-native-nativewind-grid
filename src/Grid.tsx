@@ -1,5 +1,6 @@
+/// <reference types="nativewind/types" />
 import React from 'react';
-import { View, type LayoutChangeEvent } from 'react-native';
+import { View } from 'react-native';
 import { parseGridClasses, parseItemClasses } from './parser';
 import { computeContainerStyle, computeItemStyle } from './calculator';
 
@@ -11,38 +12,44 @@ export function Grid({
     className,
     children,
     style,
-    onLayout,
     ...props
 }: GridProps) {
-    const [containerWidth, setContainerWidth] = React.useState(0);
+    // Memoize the grid spec parsing so it only runs when className changes
+    const gridSpec = React.useMemo(() => parseGridClasses(className), [className]);
 
-    const gridSpec = parseGridClasses(className);
+    const containerStyle = React.useMemo(() => computeContainerStyle(gridSpec), [gridSpec]);
 
-    const handleLayout = (e: LayoutChangeEvent) => {
-        setContainerWidth(e.nativeEvent.layout.width);
-        if (onLayout) onLayout(e);
-    };
+    // Enhance children with grid context, memoizing to avoid re-calculating on every render
+    const enhancedChildren = React.useMemo(() => {
+        return React.Children.map(children, (child) => {
+            if (!React.isValidElement(child)) return child;
 
-    const containerStyle = computeContainerStyle(gridSpec);
+            // We try to extract className from props if it exists
+            const props = child.props as { className?: string; style?: any };
+            const itemClassName = props.className;
 
-    // Enhance children with grid context
-    const enhancedChildren = React.Children.map(children, (child) => {
-        if (!React.isValidElement(child)) return child;
+            // This is still a small perf hit per child, but inevitable unless we have a different API.
+            // However, with no double-render, it's 2x faster already.
+            const itemSpec = parseItemClasses(itemClassName);
+            // The Wrapper handles the Width and the Padding (Gap)
+            const itemWrapperStyle = computeItemStyle(gridSpec, itemSpec);
 
-        // We try to extract className from props if it exists
-        const props = child.props as { className?: string; style?: any };
-        const itemClassName = props.className;
-        const itemSpec = parseItemClasses(itemClassName);
-        const itemStyle = computeItemStyle(gridSpec, itemSpec, containerWidth);
-
-        // Merge our calculated style with existing style
-        return React.cloneElement(child as React.ReactElement<any>, {
-            style: [itemStyle, props.style],
+            // The Child is rendered INSIDE the wrapper.
+            // This ensures that background colors on the child do not bleed into the gap (padding).
+            return (
+                <View style={[itemWrapperStyle]}>
+                    {child}
+                </View>
+            );
         });
-    });
+    }, [children, gridSpec]);
 
     return (
-        <View style={[containerStyle, style]} onLayout={handleLayout} {...props}>
+        <View
+            className={className}
+            style={[containerStyle, style]}
+            {...props as any}
+        >
             {enhancedChildren}
         </View>
     );
