@@ -18,13 +18,21 @@ export function computeContainerStyle(spec: GridSpec): ViewStyle {
     marginVertical: -gapY / 2,
 
     // Explicit Alignment mapping
+    // Explicit Alignment mapping
     justifyContent: spec.justifyContent, // e.g. 'center', 'space-between'
-    alignContent: spec.alignContent,     // e.g. 'center', 'space-around'
+    // alignContent is handled below to avoid duplication errors if previously added incorrectly
+
     // alignItems: spec.alignItems,      // Not usually used on the Grid container itself for cells, but maybe? 
     // Actually, 'align-items' in Grid affects Direct Children.
     // Since our Direct Children are Wrappers, this aligns the Wrappers in the row.
     // 'stretch' is default. 'center' would center the wrapper vertically in the row.
-    alignItems: spec.alignItems,
+    alignContent: spec.alignContent,     // e.g. 'center', 'space-around'
+
+    // CRITICAL FIX: Decouple item alignment from container alignment.
+    // In Grid, align-items aligns items *inside* their area.
+    // In Flexbox, align-items aligns the areas (wrappers) in the line.
+    // We must ensure wrappers stretch to fill the line so internal alignment works.
+    alignItems: 'stretch',
 
     // We explicitly reset strict gap properties to 0 because NativeWind might
     // translate 'gap-X' classes into native gap styles. We handle gaps manually via padding.
@@ -55,8 +63,7 @@ export function computeItemStyle(
     // Simplified logic: strict grid usually requires explicit placement.
   }
 
-  // Percentage width calculation
-  const widthPercentage = (100 / cols) * colSpan;
+
 
   // Alignment (Item Wrapper Internal Alignment)
   // Grid 'justify-items' (Inline Axis) -> Wrapper 'alignItems' (Cross Axis of Column Flex)
@@ -97,8 +104,17 @@ export function computeItemStyle(
     case 'stretch': wrapperJustifyContent = 'space-between'; break;
   }
 
+  let widthStyle: ViewStyle | undefined;
+  if (cols > 0) {
+    const widthPercentage = (100 / cols) * colSpan;
+    widthStyle = { width: `${widthPercentage}%` as DimensionValue };
+  }
+
+  // Inner Alignment
+  // ... (rest of logic)
+
   return {
-    width: `${widthPercentage}%` as DimensionValue,
+    ...widthStyle,
     paddingHorizontal: gapX / 2,
     paddingVertical: gapY / 2,
 

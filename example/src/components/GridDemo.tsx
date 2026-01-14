@@ -172,6 +172,110 @@ export function GridDemo() {
           </View>
         </Grid>
 
+        {/* 5. ADVANCED CONTROL (Flow, Gap X/Y, Row Placement) */}
+        <Text style={styles.sectionTitle}>5. Advanced Control</Text>
+        <Text style={styles.sectionDesc}>
+          <Text className="font-mono">grid-flow-col</Text>, <Text className="font-mono">gap-x/y</Text>, <Text className="font-mono">row-start/end</Text>
+        </Text>
+
+        {/* Grid Flow Column & Gap X/Y */}
+        <Grid className="grid grid-cols-3 grid-flow-col gap-x-8 gap-y-2 mb-8 bg-slate-100 p-4 rounded-xl border border-slate-200">
+          <View className="bg-orange-400 w-full h-10 rounded justify-center items-center"><Text className="text-white font-bold">1</Text></View>
+          <View className="bg-orange-400 w-full h-10 rounded justify-center items-center"><Text className="text-white font-bold">2</Text></View>
+          <View className="bg-orange-400 w-full h-10 rounded justify-center items-center"><Text className="text-white font-bold">3</Text></View>
+          <View className="bg-blue-400 w-full h-10 rounded justify-center items-center"><Text className="text-white font-bold">4 (Col 2)</Text></View>
+          <View className="bg-blue-400 w-full h-10 rounded justify-center items-center"><Text className="text-white font-bold">5 (Col 2)</Text></View>
+          <View className="bg-blue-400 w-full h-10 rounded justify-center items-center"><Text className="text-white font-bold">6 (Col 2)</Text></View>
+        </Grid>
+
+        {/* Explicit Row Placement */}
+        <Text style={styles.sectionDesc}>
+          Explicit Row Placement (<Text className="font-mono">row-start-1 row-end-3</Text>)
+        </Text>
+        <Grid className="grid grid-cols-3 gap-2 mb-12 h-32">
+          <View className="bg-slate-300 rounded p-2"><Text>Item 1</Text></View>
+          {/* This item forces itself to start at row 1 and span 2 rows, effectively overlapping or displacing depending on packing */}
+          <View className="row-start-1 row-end-3 bg-teal-500 rounded p-2 justify-center"><Text className="text-white font-bold">Row 1-3</Text></View>
+          <View className="bg-slate-300 rounded p-2"><Text>Item 3</Text></View>
+          <View className="bg-slate-300 rounded p-2"><Text>Item 4</Text></View>
+        </Grid>
+
+        {/* Align Content (Multi-line) */}
+        <Text style={styles.sectionDesc}>
+          <Text className="font-mono">align-content-center</Text> (packing lines in container)
+        </Text>
+        <Grid className="grid grid-cols-3 gap-2 h-40 bg-slate-200 rounded-xl content-center flex-wrap mb-8">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <View key={i} className="bg-purple-500 w-12 h-12 rounded-full border-2 border-white" />
+          ))}
+        </Grid>
+
+        {/* 5. ADVANCED CONTROL (Flow, Gap X/Y, Row Placement) */}
+        <Text style={styles.sectionTitle}>5. Advanced Control</Text>
+        <Text style={styles.sectionDesc}>
+          <Text className="font-mono">grid-flow-col</Text>, <Text className="font-mono">gap-x/y</Text>, <Text className="font-mono">row-start/end</Text>
+        </Text>
+
+        {/* Grid Flow Column & Gap X/Y */}
+        <Grid className="grid grid-cols-3 grid-flow-col gap-x-8 gap-y-2 mb-8 bg-slate-100 p-4 rounded-xl border border-slate-200">
+          <View className="bg-orange-400 w-full h-10 rounded justify-center items-center"><Text className="text-white font-bold">1</Text></View>
+          <View className="bg-orange-400 w-full h-10 rounded justify-center items-center"><Text className="text-white font-bold">2</Text></View>
+          <View className="bg-orange-400 w-full h-10 rounded justify-center items-center"><Text className="text-white font-bold">3</Text></View>
+          <View className="bg-blue-400 w-full h-10 rounded justify-center items-center"><Text className="text-white font-bold">4 (Col 2)</Text></View>
+          <View className="bg-blue-400 w-full h-10 rounded justify-center items-center"><Text className="text-white font-bold">5 (Col 2)</Text></View>
+          <View className="bg-blue-400 w-full h-10 rounded justify-center items-center"><Text className="text-white font-bold">6 (Col 2)</Text></View>
+        </Grid>
+
+        {/* Explicit Row Placement */}
+        <Text style={styles.sectionDesc}>
+          Explicit Row Placement (<Text className="font-mono">row-start-1 row-end-3</Text>)
+        </Text>
+        <Grid className="grid grid-cols-3 gap-2 mb-12 h-32">
+          <View className="bg-slate-300 rounded p-2"><Text>Item 1</Text></View>
+          {/* This item forces itself to start at row 1 and span 2 rows, effectively overlapping or displacing depending on packing */}
+          <View className="row-start-1 row-end-3 bg-teal-500 rounded p-2 justify-center"><Text className="text-white font-bold">Row 1-3</Text></View>
+          <View className="bg-slate-300 rounded p-2"><Text>Item 3</Text></View>
+          <View className="bg-slate-300 rounded p-2"><Text>Item 4</Text></View>
+        </Grid>
+
+        {/* Align Content (Multi-line) */}
+        <Text style={styles.sectionDesc}>
+          <Text className="font-mono">align-content-center</Text> (packing lines in container)
+        </Text>
+        <Grid className="grid grid-cols-3 gap-2 h-40 bg-slate-200 rounded-xl content-center flex-wrap mb-8">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <View key={i} className="bg-purple-500 w-12 h-12 rounded-full border-2 border-white" />
+          ))}
+        </Grid>
+
+        {/* 6. FLEX UTILITIES (Mix & Match) */}
+        <Text style={styles.sectionTitle}>6. Flex Utilities & Auto</Text>
+        <Text style={styles.sectionDesc}>
+          <Text className="font-mono">flex-row-reverse</Text>, <Text className="font-mono">flex-nowrap</Text>, <Text className="font-mono">grow</Text>
+        </Text>
+
+        {/* Flex Row Reverse & No Wrap (grid-cols-none for auto widths) */}
+        <Grid className="grid grid-cols-none flex-row-reverse flex-nowrap gap-2 bg-slate-100 p-2 mb-8 overflow-hidden">
+          <View className="w-20 h-10 bg-red-400 justify-center items-center"><Text>1</Text></View>
+          <View className="w-20 h-10 bg-green-400 justify-center items-center"><Text>2</Text></View>
+          <View className="w-20 h-10 bg-blue-400 justify-center items-center"><Text>3</Text></View>
+        </Grid>
+
+        {/* Flex Grow Internal */}
+        <Text style={styles.sectionDesc}>
+          Internal <Text className="font-mono">flex-1</Text> inside Grid Items
+        </Text>
+        <Grid className="grid grid-cols-2 gap-4 h-32">
+          <View className="bg-white p-2 rounded flex-row gap-2">
+            <View className="w-8 h-full bg-slate-200" />
+            <View className="flex-1 bg-indigo-200 justify-center items-center"><Text>Flex 1</Text></View>
+          </View>
+          <View className="bg-white p-2 rounded flex-col gap-2">
+            <View className="h-4 w-full bg-slate-200" />
+            <View className="flex-1 bg-pink-200 justify-center items-center"><Text>Flex 1</Text></View>
+          </View>
+        </Grid>
+
         <View style={{ height: 100 }} />
       </ScrollView>
     </SafeAreaView>

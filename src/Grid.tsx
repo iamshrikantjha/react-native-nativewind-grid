@@ -75,7 +75,7 @@ export function Grid({
 
     return (
         <View
-            style={[containerStyle, style]}
+            style={[containerStyle, style, { gap: 0, rowGap: 0, columnGap: 0 }]}
             {...props as any}
         >
             {enhancedChildren}

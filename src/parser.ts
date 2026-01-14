@@ -111,8 +111,12 @@ export function parseGridClasses(className?: string): GridSpec {
 
   classes.forEach((cls) => {
     // grid-cols
-    const cols = parseValue(cls, 'grid-cols-');
-    if (cols !== undefined) spec.cols = cols;
+    if (cls === 'grid-cols-none') {
+      spec.cols = 0; // Signal to calculator to use auto width
+    } else {
+      const cols = parseValue(cls, 'grid-cols-');
+      if (cols !== undefined) spec.cols = cols;
+    }
 
     // grid-rows
     const rows = parseValue(cls, 'grid-rows-');
