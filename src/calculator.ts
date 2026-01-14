@@ -6,13 +6,26 @@ export function computeContainerStyle(spec: GridSpec): ViewStyle {
   const gapX = spec.gapX ?? gap;
   const gapY = spec.gapY ?? gap;
 
-  // With percentage widths, we still need negative margins on the container
-  // to offset the padding on items (which create the gaps).
+  // Map Grid Alignment to Flexbox Container Alignment
+  // justify-content (Grid) -> Main Axis Distribution
+  // align-content (Grid) -> Cross Axis Distribution (Lines)
+  // align-items (Grid) -> Cross Axis Item Alignment (Note: We handle 'justify-items' on the child wrapper)
+
   return {
     flexDirection: spec.autoFlow === 'column' ? 'column' : 'row',
     flexWrap: 'wrap',
     marginHorizontal: -gapX / 2,
     marginVertical: -gapY / 2,
+
+    // Explicit Alignment mapping
+    justifyContent: spec.justifyContent, // e.g. 'center', 'space-between'
+    alignContent: spec.alignContent,     // e.g. 'center', 'space-around'
+    // alignItems: spec.alignItems,      // Not usually used on the Grid container itself for cells, but maybe? 
+    // Actually, 'align-items' in Grid affects Direct Children.
+    // Since our Direct Children are Wrappers, this aligns the Wrappers in the row.
+    // 'stretch' is default. 'center' would center the wrapper vertically in the row.
+    alignItems: spec.alignItems,
+
     // We explicitly reset strict gap properties to 0 because NativeWind might
     // translate 'gap-X' classes into native gap styles. We handle gaps manually via padding.
     gap: 0,
@@ -24,23 +37,73 @@ export function computeContainerStyle(spec: GridSpec): ViewStyle {
 export function computeItemStyle(
   gridSpec: GridSpec,
   itemSpec: ItemSpec
-  // Container width is no longer needed!
 ): ViewStyle {
   const gap = gridSpec.gap ?? 0;
   const gapX = gridSpec.gapX ?? gap;
   const gapY = gridSpec.gapY ?? gap;
 
   const cols = gridSpec.cols || 1;
-  const span = itemSpec.colSpan || 1;
+
+  // Span Logic: Support col-end/row-end
+  // If colEnd is present, span = colEnd - colStart (or 1 if no start)
+  let colSpan = itemSpec.colSpan || 1;
+  if (itemSpec.colEnd) {
+    if (itemSpec.colStart) {
+      colSpan = itemSpec.colEnd - itemSpec.colStart;
+    }
+    // Else ignore end without start for now or assume start=1? 
+    // Simplified logic: strict grid usually requires explicit placement.
+  }
 
   // Percentage width calculation
-  // 100% / cols * span
-  // Example: 3 cols, span 1 = 33.333%
-  const widthPercentage = (100 / cols) * span;
+  const widthPercentage = (100 / cols) * colSpan;
+
+  // Alignment (Item Wrapper Internal Alignment)
+  // Grid 'justify-items' (Inline Axis) -> Wrapper 'alignItems' (Cross Axis of Column Flex)
+  // Grid 'align-items' (Block Axis)   -> Wrapper 'justifyContent' (Main Axis of Column Flex)
+
+  // Resolve effective values (Self overrides Container)
+
+  // Inline Axis (Horizontal)
+  const justify = itemSpec.justifySelf && itemSpec.justifySelf !== 'auto'
+    ? itemSpec.justifySelf
+    : gridSpec.justifyItems; // Inherit container justify-items
+
+  // Block Axis (Vertical)
+  const align = itemSpec.alignSelf && itemSpec.alignSelf !== 'auto'
+    ? itemSpec.alignSelf
+    : undefined;
+
+  // Let's implement Inner Alignment on Wrapper:
+  // Wrapper is Flex Column.
+  // Horizontal Center = alignItems: center
+  // Vertical Center   = justifyContent: center
+
+  let wrapperAlignItems: ViewStyle['alignItems']; // Horizontal
+  switch (justify) {
+    case 'start': wrapperAlignItems = 'flex-start'; break;
+    case 'end': wrapperAlignItems = 'flex-end'; break;
+    case 'center': wrapperAlignItems = 'center'; break;
+    case 'stretch': wrapperAlignItems = 'stretch'; break;
+  }
+
+  let wrapperJustifyContent: ViewStyle['justifyContent']; // Vertical
+
+  const effectiveAlign = align || gridSpec.alignItems; // Fallback to container items
+  switch (effectiveAlign) {
+    case 'flex-start': wrapperJustifyContent = 'flex-start'; break;
+    case 'flex-end': wrapperJustifyContent = 'flex-end'; break;
+    case 'center': wrapperJustifyContent = 'center'; break;
+    case 'stretch': wrapperJustifyContent = 'space-between'; break;
+  }
 
   return {
     width: `${widthPercentage}%` as DimensionValue,
     paddingHorizontal: gapX / 2,
     paddingVertical: gapY / 2,
+
+    // Inner Alignment
+    alignItems: wrapperAlignItems,
+    justifyContent: wrapperJustifyContent,
   };
 }

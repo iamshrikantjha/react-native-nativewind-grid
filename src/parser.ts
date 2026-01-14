@@ -1,12 +1,15 @@
 export interface GridSpec {
   cols: number;
-  rows?: number; // Optional for now, main use case is cols
+  rows?: number;
   gap: number;
   gapX?: number;
   gapY?: number;
   autoFlow: 'row' | 'column';
-  autoCols?: string;
-  autoRows?: string;
+  // Alignment (Container)
+  justifyContent?: 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly';
+  alignContent?: 'flex-start' | 'flex-end' | 'center' | 'stretch' | 'space-between' | 'space-around';
+  justifyItems?: 'start' | 'end' | 'center' | 'stretch';
+  alignItems?: 'flex-start' | 'flex-end' | 'center' | 'stretch' | 'baseline';
 }
 
 export interface ItemSpec {
@@ -16,7 +19,83 @@ export interface ItemSpec {
   rowStart?: number;
   colEnd?: number;
   rowEnd?: number;
+  order?: number;
+  // Alignment (Item)
+  justifySelf?: 'auto' | 'start' | 'end' | 'center' | 'stretch';
+  alignSelf?: 'auto' | 'flex-start' | 'flex-end' | 'center' | 'stretch' | 'baseline';
 }
+
+// Helpers
+const parseArbitrary = (cls: string, prefix: string): number | undefined => {
+  if (cls.startsWith(`${prefix}[`) && cls.endsWith(']')) {
+    const val = cls.slice(prefix.length + 1, -1);
+    const num = parseInt(val, 10);
+    return isNaN(num) ? undefined : num;
+  }
+  return undefined;
+};
+
+const parseValue = (cls: string, prefix: string): number | undefined => {
+  // Check arbitrary first: prefix-[123]
+  const arb = parseArbitrary(cls, prefix);
+  if (arb !== undefined) return arb;
+
+  // Check standard: prefix-12
+  if (cls.startsWith(prefix)) {
+    const val = cls.replace(prefix, '');
+    const num = parseInt(val, 10);
+    return isNaN(num) ? undefined : num;
+  }
+  return undefined;
+};
+
+// Map tailwind classes to flexbox values
+const mapJustifyContent = (val: string) => {
+  switch (val) {
+    case 'start': return 'flex-start';
+    case 'end': return 'flex-end';
+    case 'center': return 'center';
+    case 'between': return 'space-between';
+    case 'around': return 'space-around';
+    case 'evenly': return 'space-evenly';
+    default: return undefined;
+  }
+};
+
+const mapAlignContent = (val: string) => {
+  switch (val) {
+    case 'start': return 'flex-start';
+    case 'end': return 'flex-end';
+    case 'center': return 'center';
+    case 'between': return 'space-between';
+    case 'around': return 'space-around';
+    case 'stretch': return 'stretch';
+    default: return undefined;
+  }
+};
+
+const mapAlignItems = (val: string) => {
+  switch (val) {
+    case 'start': return 'flex-start';
+    case 'end': return 'flex-end';
+    case 'center': return 'center';
+    case 'baseline': return 'baseline';
+    case 'stretch': return 'stretch';
+    default: return undefined;
+  }
+};
+
+const mapAlignSelf = (val: string) => {
+  switch (val) {
+    case 'auto': return 'auto';
+    case 'start': return 'flex-start';
+    case 'end': return 'flex-end';
+    case 'center': return 'center';
+    case 'stretch': return 'stretch';
+    case 'baseline': return 'baseline';
+    default: return undefined;
+  }
+};
 
 export function parseGridClasses(className?: string): GridSpec {
   const spec: GridSpec = {
@@ -31,43 +110,76 @@ export function parseGridClasses(className?: string): GridSpec {
   const classes = className.split(/\s+/);
 
   classes.forEach((cls) => {
-    // grid-cols-{n}
-    if (cls.startsWith('grid-cols-')) {
-      const val = cls.replace('grid-cols-', '');
-      const num = parseInt(val, 10);
-      if (!isNaN(num)) spec.cols = num;
-    }
+    // grid-cols
+    const cols = parseValue(cls, 'grid-cols-');
+    if (cols !== undefined) spec.cols = cols;
 
-    // grid-rows-{n}
-    if (cls.startsWith('grid-rows-')) {
-      const val = cls.replace('grid-rows-', '');
-      const num = parseInt(val, 10);
-      if (!isNaN(num)) spec.rows = num;
-    }
+    // grid-rows
+    const rows = parseValue(cls, 'grid-rows-');
+    if (rows !== undefined) spec.rows = rows;
 
-    // gap-{n}
-    // Note: In Tailwind, gap-1 is 0.25rem (4px). We assume standard 4px base.
-    // If users use arbitrary values or config, this simple parser might drift,
-    // but for now we follow standard multiplier.
+    // gap
+    // Note: Arbitrary values like gap-[20px] will be parsed as 20.
+    // Standard gap-{n} is n * 4.
     if (cls.startsWith('gap-')) {
+      // Check arbitrary first: gap-[10px]
+      if (cls.includes('[')) {
+        const arb = parseArbitrary(cls, 'gap-');
+        if (arb !== undefined) {
+          spec.gap = arb;
+          return; // Skip standard check
+        }
+        // X/Y arbitrary
+        const arbX = parseArbitrary(cls, 'gap-x-');
+        if (arbX !== undefined) {
+          spec.gapX = arbX;
+          return;
+        }
+        const arbY = parseArbitrary(cls, 'gap-y-');
+        if (arbY !== undefined) {
+          spec.gapY = arbY;
+          return;
+        }
+      }
+
+      // Standard logic
       if (cls.startsWith('gap-x-')) {
-        const val = cls.replace('gap-x-', '');
-        const num = parseInt(val, 10);
-        if (!isNaN(num)) spec.gapX = num * 4;
+        const val = parseInt(cls.replace('gap-x-', ''), 10);
+        if (!isNaN(val)) spec.gapX = val * 4;
       } else if (cls.startsWith('gap-y-')) {
-        const val = cls.replace('gap-y-', '');
-        const num = parseInt(val, 10);
-        if (!isNaN(num)) spec.gapY = num * 4;
+        const val = parseInt(cls.replace('gap-y-', ''), 10);
+        if (!isNaN(val)) spec.gapY = val * 4;
       } else {
-        const val = cls.replace('gap-', '');
-        const num = parseInt(val, 10);
-        if (!isNaN(num)) spec.gap = num * 4;
+        // Standard gap-
+        const val = parseInt(cls.replace('gap-', ''), 10);
+        if (!isNaN(val)) spec.gap = val * 4;
       }
     }
 
-    // grid-flow-col
-    if (cls === 'grid-flow-col') {
-      spec.autoFlow = 'column';
+    // Flow
+    if (cls === 'grid-flow-col') spec.autoFlow = 'column';
+
+    // Alignment
+    if (cls.startsWith('justify-content-') || cls.startsWith('justify-')) { // loose match for content
+      const val = cls.replace(/^justify-(content-)?/, '');
+      const mapped = mapJustifyContent(val);
+      if (mapped) spec.justifyContent = mapped as any;
+    }
+    if (cls.startsWith('align-content-')) {
+      const val = cls.replace('align-content-', '');
+      const mapped = mapAlignContent(val);
+      if (mapped) spec.alignContent = mapped as any;
+    }
+    if (cls.startsWith('items-') || cls.startsWith('align-items-')) {
+      const val = cls.replace(/^(items-|align-items-)/, '');
+      const mapped = mapAlignItems(val);
+      if (mapped) spec.alignItems = mapped as any;
+    }
+    if (cls.startsWith('justify-items-')) {
+      const val = cls.replace('justify-items-', '');
+      if (['start', 'end', 'center', 'stretch'].includes(val)) {
+        spec.justifyItems = val as any;
+      }
     }
   });
 
@@ -84,32 +196,46 @@ export function parseItemClasses(className?: string): ItemSpec {
   const classes = className.split(/\s+/);
 
   classes.forEach((cls) => {
-    // col-span-{n}
-    if (cls.startsWith('col-span-')) {
-      const val = cls.replace('col-span-', '');
-      const num = parseInt(val, 10);
-      if (!isNaN(num)) spec.colSpan = num;
-    }
+    // Spans
+    const colSpan = parseValue(cls, 'col-span-');
+    if (colSpan !== undefined) spec.colSpan = colSpan;
 
-    // row-span-{n}
-    if (cls.startsWith('row-span-')) {
-      const val = cls.replace('row-span-', '');
-      const num = parseInt(val, 10);
-      if (!isNaN(num)) spec.rowSpan = num;
-    }
+    const rowSpan = parseValue(cls, 'row-span-');
+    if (rowSpan !== undefined) spec.rowSpan = rowSpan;
 
-    // col-start-{n}
-    if (cls.startsWith('col-start-')) {
-      const val = cls.replace('col-start-', '');
-      const num = parseInt(val, 10);
-      if (!isNaN(num)) spec.colStart = num;
-    }
+    // Starts
+    const colStart = parseValue(cls, 'col-start-');
+    if (colStart !== undefined) spec.colStart = colStart;
 
-    // row-start-{n}
-    if (cls.startsWith('row-start-')) {
-      const val = cls.replace('row-start-', '');
-      const num = parseInt(val, 10);
-      if (!isNaN(num)) spec.rowStart = num;
+    const rowStart = parseValue(cls, 'row-start-');
+    if (rowStart !== undefined) spec.rowStart = rowStart;
+
+    // Ends
+    const colEnd = parseValue(cls, 'col-end-');
+    if (colEnd !== undefined) spec.colEnd = colEnd;
+
+    const rowEnd = parseValue(cls, 'row-end-');
+    if (rowEnd !== undefined) spec.rowEnd = rowEnd;
+
+    // Order
+    const order = parseValue(cls, 'order-');
+    if (order !== undefined) spec.order = order;
+    // first/last/none
+    if (cls === 'order-first') spec.order = -9999;
+    if (cls === 'order-last') spec.order = 9999;
+    if (cls === 'order-none') spec.order = 0;
+
+    // Alignment Self
+    if (cls.startsWith('self-') || cls.startsWith('align-self-')) {
+      const val = cls.replace(/^(self-|align-self-)/, '');
+      const mapped = mapAlignSelf(val);
+      if (mapped) spec.alignSelf = mapped as any;
+    }
+    if (cls.startsWith('justify-self-')) {
+      const val = cls.replace('justify-self-', '');
+      if (['auto', 'start', 'end', 'center', 'stretch'].includes(val)) {
+        spec.justifySelf = val as any;
+      }
     }
   });
 

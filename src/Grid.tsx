@@ -6,12 +6,14 @@ import { computeContainerStyle, computeItemStyle } from './calculator';
 
 export type GridProps = React.ComponentProps<typeof View> & {
     className?: string;
+    debug?: boolean;
 };
 
 export function Grid({
     className,
     children,
     style,
+    debug,
     ...props
 }: GridProps) {
     // Memoize the grid spec parsing so it only runs when className changes
@@ -19,34 +21,60 @@ export function Grid({
 
     const containerStyle = React.useMemo(() => computeContainerStyle(gridSpec), [gridSpec]);
 
-    // Enhance children with grid context, memoizing to avoid re-calculating on every render
+    // Enhance children with grid context
     const enhancedChildren = React.useMemo(() => {
-        return React.Children.map(children, (child) => {
-            if (!React.isValidElement(child)) return child;
+        // First Pass: Parse all children to get their specs (needed for sorting)
+        const parsedChildren = React.Children.toArray(children).map((child) => {
+            if (!React.isValidElement(child)) return { child, order: 0, itemSpec: null };
 
-            // We try to extract className from props if it exists
             const props = child.props as { className?: string; style?: any };
             const itemClassName = props.className;
 
-            // This is still a small perf hit per child, but inevitable unless we have a different API.
-            // However, with no double-render, it's 2x faster already.
             const itemSpec = parseItemClasses(itemClassName);
+            return {
+                child,
+                order: itemSpec.order ?? 0,
+                itemSpec
+            };
+        });
+
+        // Sort by Order
+        parsedChildren.sort((a, b) => a.order - b.order);
+
+        // Debug Logging
+        if (debug) {
+            console.log('[NativeWindGrid] Debug Info:');
+            console.log('GridSpec:', JSON.stringify(gridSpec, null, 2));
+            console.log('Children Count:', parsedChildren.length);
+        }
+
+        // Second Pass: Compute Styles and Render
+        return parsedChildren.map((item, index) => {
+            const { child, itemSpec } = item;
+
+            // Non-element children (text/strings/null) just pass through
+            if (!itemSpec || !React.isValidElement(child)) return child;
+
             // The Wrapper handles the Width and the Padding (Gap)
             const itemWrapperStyle = computeItemStyle(gridSpec, itemSpec);
 
+            if (debug) {
+                console.log(`Item ${index}:`, JSON.stringify({ spec: itemSpec, style: itemWrapperStyle }, null, 2));
+            }
+
             // The Child is rendered INSIDE the wrapper.
             // This ensures that background colors on the child do not bleed into the gap (padding).
+            // We use 'fragment' key or just index key since order might have changed.
             return (
-                <View style={[itemWrapperStyle]}>
+                <View key={child.key || index} style={[itemWrapperStyle]}>
                     {child}
                 </View>
             );
         });
-    }, [children, gridSpec]);
+    }, [children, gridSpec, debug]);
 
     return (
         <View
-            className={className}
             style={[containerStyle, style]}
             {...props as any}
         >

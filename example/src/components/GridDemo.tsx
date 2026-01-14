@@ -1,4 +1,5 @@
-import { Text, View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+import { Text, View, StyleSheet, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Grid } from 'react-native-nativewind-grid';
 
 // Color Palette
@@ -33,147 +34,84 @@ export function GridDemo() {
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>NativeWind Grid</Text>
-          <Text style={styles.subtitle}>Premium Layout Engine</Text>
+          <Text style={styles.subtitle}>Premium Layout Engine v2.0</Text>
         </View>
 
-        {/* SECTION 1: BENTO GRID DASHBOARD */}
-        <Text style={styles.sectionTitle}>Dashboard (Bento Grid)</Text>
+        {/* SECTION 1: ARBITRARY VALUES & PLACEMENT */}
+        <Text style={styles.sectionTitle}>1. Arbitrary Values & Placement</Text>
         <Text style={styles.sectionDesc}>
-          Complex spans using col-span & row-span
+          grid-cols-[5], gap-[15px], col-start / col-end
         </Text>
 
-        <Grid className="grid grid-cols-4 gap-3">
-          {/* Large Main Stat */}
-          <View
-            className="col-span-2 row-span-2"
-            style={[styles.card, styles.bgPrimary]}
-          >
-            <Text style={[styles.cardTitle, styles.textWhite]}>
-              Total Revenue
-            </Text>
-            <Text style={[styles.cardValueLarge, styles.textWhite]}>
-              $48.5k
-            </Text>
-            <Text style={[styles.cardSub, styles.textWhiteOpac]}>
-              +12.5% from last month
-            </Text>
+        <Grid className="grid grid-cols-[5] gap-[15px] mb-8">
+          <View className="col-span-2 bg-indigo-500 h-20 rounded-lg justify-center items-center">
+            <Text style={styles.textWhite}>Span 2</Text>
           </View>
-
-          {/* Small Stats */}
-          <Card title="Active Users" value="2.4k" className="col-span-1" />
-          <Card title="New Signups" value="+180" className="col-span-1" />
-
-          {/* Medium Width Stat */}
-          <View
-            className="col-span-2"
-            style={[styles.card, styles.bgSecondary]}
-          >
-            <Text style={[styles.cardTitle, styles.textWhite]}>
-              Engagement Rate
-            </Text>
-            <Text style={[styles.cardValue, styles.textWhite]}>84%</Text>
+          <View className="col-start-3 col-end-6 bg-purple-500 h-20 rounded-lg justify-center items-center">
+            <Text style={styles.textWhite}>Start 3 / End 6 (Span 3)</Text>
           </View>
-
-          {/* Full Width Graph Placeholder */}
-          <View className="col-span-4" style={[styles.card, styles.bgDark]}>
-            <Text style={[styles.cardTitle, styles.textWhite]}>
-              Monthly Analytics
-            </Text>
-            <View style={styles.graphContainer}>
-              <View style={[styles.bar, { height: '40%' }]} />
-              <View
-                style={[
-                  styles.bar,
-                  { height: '70%', backgroundColor: colors.primary },
-                ]}
-              />
-              <View style={[styles.bar, { height: '50%' }]} />
-              <View
-                style={[
-                  styles.bar,
-                  { height: '85%', backgroundColor: colors.secondary },
-                ]}
-              />
-              <View style={[styles.bar, { height: '60%' }]} />
-              <View style={[styles.bar, { height: '75%' }]} />
-            </View>
+          <View className="col-span-5 bg-slate-700 h-10 rounded-lg justify-center items-center mt-2">
+            <Text style={styles.textWhite}>Full Width (Span 5)</Text>
           </View>
         </Grid>
 
-        {/* SECTION 2: KEYPAD / CALCULATOR (GRID FLOW) */}
-        <View style={styles.divider} />
-        <Text style={styles.sectionTitle}>Keypad Layout</Text>
-        <Text style={styles.sectionDesc}>Using grid-flow-col type layout</Text>
 
-        <View style={styles.calculatorShell}>
-          <View style={styles.screen}>
-            <Text style={styles.screenText}>1,234.56</Text>
+        {/* SECTION 2: ALIGNMENT & JUSTIFICATION */}
+        <Text style={styles.sectionTitle}>2. Alignment & Justification</Text>
+        <Text style={styles.sectionDesc}>
+          justify-between, items-center (Container)
+        </Text>
+
+        {/* Container Level Alignment */}
+        <Grid className="grid grid-cols-3 gap-2 h-40 bg-white rounded-xl mb-8 justify-between items-center p-2">
+          <View className="bg-red-400 w-16 h-16 rounded-md justify-center items-center"><Text>1</Text></View>
+          <View className="bg-red-400 w-16 h-16 rounded-md justify-center items-center"><Text>2</Text></View>
+          <View className="bg-red-400 w-16 h-16 rounded-md justify-center items-center"><Text>3</Text></View>
+        </Grid>
+
+        <Text style={styles.sectionDesc}>
+          self-start, self-center, self-end (Item Level)
+        </Text>
+        <Grid className="grid grid-cols-3 gap-2 h-40 bg-white rounded-xl mb-8 p-2">
+          <View className="bg-green-400 w-full h-10 rounded-md self-start justify-center items-center"><Text>Start</Text></View>
+          <View className="bg-green-400 w-full h-10 rounded-md self-center justify-center items-center"><Text>Center</Text></View>
+          <View className="bg-green-400 w-full h-10 rounded-md self-end justify-center items-center"><Text>End</Text></View>
+        </Grid>
+
+
+        {/* SECTION 3: ORDERING */}
+        <Text style={styles.sectionTitle}>3. Ordering</Text>
+        <Text style={styles.sectionDesc}>
+          order-first, order-last, order-{'{'}n{'}'}
+        </Text>
+
+        <Grid className="grid grid-cols-3 gap-3 mb-8">
+          <View className="bg-slate-300 h-20 rounded-lg justify-center items-center order-last">
+            <Text style={styles.cardTitle}>1 (Last)</Text>
           </View>
-          <Grid className="grid grid-cols-4 gap-3">
-            {['C', '±', '%', '÷'].map(k => (
-              <Key key={k} label={k} type="func" />
-            ))}
-            {[7, 8, 9, '×', 4, 5, 6, '-', 1, 2, 3, '+'].map(k => (
-              <Key
-                key={k.toString()}
-                label={k}
-                type={typeof k === 'number' ? 'num' : 'op'}
-              />
-            ))}
-            <View className="col-span-2">
-              <View style={[styles.key, styles.keyZero]}>
-                <Text style={styles.keyText}>0</Text>
-              </View>
-            </View>
-            <Key label="." type="num" />
-            <Key label="=" type="op" />
-          </Grid>
-        </View>
+          <View className="bg-slate-400 h-20 rounded-lg justify-center items-center">
+            <Text style={styles.cardTitle}>2</Text>
+          </View>
+          <View className="bg-slate-800 h-20 rounded-lg justify-center items-center order-first">
+            <Text style={[styles.cardTitle, styles.textWhite]}>3 (First)</Text>
+          </View>
+        </Grid>
 
-        {/* SECTION 3: IMAGE GALLERY */}
-        <View style={styles.divider} />
-        <Text style={styles.sectionTitle}>Masonry-style Gallery</Text>
-        <Text style={styles.sectionDesc}>Mixed aspect ratios with gaps</Text>
 
-        <Grid className="grid grid-cols-3 gap-2">
-          <ImagePlaceholder
-            height={150}
-            color={colors.primary}
-            className="col-span-1"
-          />
-          <ImagePlaceholder
-            height={150}
-            color={colors.accent}
-            className="col-span-1"
-          />
-          <ImagePlaceholder
-            height={310}
-            color={colors.warning}
-            className="col-span-1 row-span-2"
-            text="Tall Item"
-          />
+        {/* SECTION 4: MASONRY / MIXED */}
+        <Text style={styles.sectionTitle}>4. Complex Dashboard</Text>
+        <Grid className="grid grid-cols-4 gap-3">
+          <View className="col-span-2 row-span-2 bg-indigo-600 rounded-2xl p-4 justify-between">
+            <Text style={[styles.cardTitle, styles.textWhite]}>Revenue</Text>
+            <Text style={[styles.cardValueLarge, styles.textWhite]}>$50k</Text>
+          </View>
 
-          <ImagePlaceholder
-            height={150}
-            color={colors.success}
-            className="col-span-2"
-            text="Wide Item"
-          />
-          <ImagePlaceholder
-            height={150}
-            color={colors.secondary}
-            className="col-span-1"
-          />
-          <ImagePlaceholder
-            height={150}
-            color={colors.dark}
-            className="col-span-1"
-          />
-          <ImagePlaceholder
-            height={150}
-            color={colors.primary}
-            className="col-span-1"
-          />
+          <Card title="Users" value="2.1k" className="col-span-1" />
+          <Card title="Bounce" value="12%" className="col-span-1" />
+
+          <View className="col-span-2 bg-pink-500 rounded-2xl p-4 justify-center">
+            <Text style={[styles.cardTitle, styles.textWhite]}>Campaign Active</Text>
+          </View>
         </Grid>
 
         <View style={{ height: 50 }} />
