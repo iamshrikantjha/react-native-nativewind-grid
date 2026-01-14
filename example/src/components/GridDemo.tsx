@@ -1,3 +1,5 @@
+// Premium Bento Grid & Modern Dashboard Demo
+// Showcasing: Bento Layouts, Complex Spans, Arbitrary Values, Alignment Shortcuts (place-*)
 import { Text, View, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Grid } from 'react-native-nativewind-grid';
@@ -16,149 +18,170 @@ const colors = {
   textLight: '#94A3B8',
 };
 
-const Card = ({ title, value, icon, style, className }: any) => (
-  <View style={[styles.card, style]} className={className}>
-    <Text style={styles.cardTitle}>{title}</Text>
-    <Text style={styles.cardValue}>{value}</Text>
-    {icon && (
-      <View style={styles.iconContainer}>
-        <Text style={styles.icon}>{icon}</Text>
-      </View>
-    )}
-  </View>
-);
-
 export function GridDemo() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
+        {/* HERO HEADER */}
         <View style={styles.header}>
+          <View className="mb-2 bg-indigo-100 self-start px-3 py-1 rounded-full border border-indigo-200">
+            <Text className="text-indigo-700 font-bold text-xs uppercase tracking-wider">v2.0 Update</Text>
+          </View>
           <Text style={styles.title}>NativeWind Grid</Text>
-          <Text style={styles.subtitle}>Premium Layout Engine v2.0</Text>
+          <Text style={styles.subtitle}>
+            The ultimate layout engine for React Native.
+            <Text style={{ fontWeight: '700', color: colors.primary }}> Now with place-* shortcuts.</Text>
+          </Text>
         </View>
 
-        {/* SECTION 1: ARBITRARY VALUES & PLACEMENT */}
-        <Text style={styles.sectionTitle}>1. Arbitrary Values & Placement</Text>
+        {/* 1. MODERN BENTO PORTFOLIO (Trending 2024/25) */}
+        <Text style={styles.sectionTitle}>1. Trending Bento Portfolio</Text>
         <Text style={styles.sectionDesc}>
-          grid-cols-[5], gap-[15px], col-start / col-end
+          Mixed content types, rounded corners, complex spans.
         </Text>
 
-        <Grid className="grid grid-cols-[5] gap-[15px] mb-8">
-          <View className="col-span-2 bg-indigo-500 h-20 rounded-lg justify-center items-center">
-            <Text style={styles.textWhite}>Span 2</Text>
+        <Grid className="grid grid-cols-4 gap-4 mb-12">
+          {/* Profile Large */}
+          <View className="col-span-2 row-span-2 bg-white rounded-3xl p-5 shadow-sm justify-between">
+            <View className="flex-row items-center gap-3">
+              <View className="w-12 h-12 bg-slate-200 rounded-full items-center justify-center">
+                <Text className="text-xl">👨‍💻</Text>
+              </View>
+              <View>
+                <Text className="font-bold text-lg text-slate-800">Alex Designer</Text>
+                <Text className="text-slate-500 text-sm">Product Lead</Text>
+              </View>
+            </View>
+            <View>
+              <Text className="text-3xl font-black text-slate-800 mt-2">4.8k</Text>
+              <Text className="text-slate-500">Project Views</Text>
+            </View>
           </View>
-          <View className="col-start-3 col-end-6 bg-purple-500 h-20 rounded-lg justify-center items-center">
-            <Text style={styles.textWhite}>Start 3 / End 6 (Span 3)</Text>
+
+          {/* Social Link (Dark Mode) */}
+          <View className="col-span-2 bg-slate-900 rounded-3xl p-5 flex-row justify-between items-center shadow-sm">
+            <Text className="text-white font-bold text-lg">GitHub</Text>
+            <View className="w-8 h-8 rounded-full bg-white/20 items-center justify-center transform -rotate-45">
+              <Text className="text-white">➜</Text>
+            </View>
           </View>
-          <View className="col-span-5 bg-slate-700 h-10 rounded-lg justify-center items-center mt-2">
-            <Text style={styles.textWhite}>Full Width (Span 5)</Text>
+
+          {/* Stat Square 1 */}
+          <View className="col-span-1 bg-indigo-500 rounded-3xl items-center justify-center p-2 shadow-sm">
+            <Text className="text-white text-2xl font-bold">12</Text>
+            <Text className="text-indigo-200 text-xs">Apps</Text>
+          </View>
+
+          {/* Stat Square 2 */}
+          <View className="col-span-1 bg-pink-500 rounded-3xl items-center justify-center p-2 shadow-sm">
+            <Text className="text-white text-2xl font-bold">85%</Text>
+            <Text className="text-pink-200 text-xs">Growth</Text>
+          </View>
+
+          {/* Long Bar */}
+          <View className="col-span-4 bg-white rounded-3xl p-4 flex-row items-center justify-between shadow-sm">
+            <Text className="text-slate-600 font-medium">Available for hire</Text>
+            <View className="bg-green-100 px-3 py-1 rounded-full">
+              <Text className="text-green-700 font-bold text-xs uppercase">Yes</Text>
+            </View>
           </View>
         </Grid>
 
 
-        {/* SECTION 2: ALIGNMENT & JUSTIFICATION */}
-        <Text style={styles.sectionTitle}>2. Alignment & Justification</Text>
+        {/* 2. ADVANCED ALIGNMENT (place-*) */}
+        <Text style={styles.sectionTitle}>2. Alignment Shortcuts</Text>
         <Text style={styles.sectionDesc}>
-          justify-between, items-center (Container)
+          Using <Text className="font-mono text-purple-600 bg-purple-100 px-1 rounded">place-items-center</Text> shorthands.
         </Text>
 
-        {/* Container Level Alignment */}
-        <Grid className="grid grid-cols-3 gap-2 h-40 bg-white rounded-xl mb-8 justify-between items-center p-2">
-          <View className="bg-red-400 w-16 h-16 rounded-md justify-center items-center"><Text>1</Text></View>
-          <View className="bg-red-400 w-16 h-16 rounded-md justify-center items-center"><Text>2</Text></View>
-          <View className="bg-red-400 w-16 h-16 rounded-md justify-center items-center"><Text>3</Text></View>
+        <Grid className="grid grid-cols-2 gap-4 h-48 mb-12">
+          {/* Box 1: place-items-center (Centers both X and Y) */}
+          <View className="bg-white rounded-lg place-items-center shadow-sm border border-slate-100">
+            <View className="w-8 h-8 bg-purple-500 rounded-full shadow-lg" />
+            <Text className="text-xs text-slate-400 mt-2">place-items-center</Text>
+          </View>
+
+          {/* Box 2: place-content-between (Distributes content) */}
+          <View className="bg-white rounded-lg p-4 place-content-between shadow-sm border border-slate-100">
+            <View className="w-full h-2 bg-slate-200 rounded-full" />
+            <View className="w-2/3 h-2 bg-slate-200 rounded-full" />
+            <View className="w-full h-8 bg-indigo-50 rounded-lg items-center justify-center">
+              <Text className="text-indigo-500 font-bold text-xs">Action</Text>
+            </View>
+            <Text className="text-xs text-slate-400 text-center mt-1">place-content-between</Text>
+          </View>
         </Grid>
 
+
+        {/* 3. ARBITRARY VALUES & ORDER */}
+        <Text style={styles.sectionTitle}>3. Arbitrary & Order</Text>
         <Text style={styles.sectionDesc}>
-          self-start, self-center, self-end (Item Level)
-        </Text>
-        <Grid className="grid grid-cols-3 gap-2 h-40 bg-white rounded-xl mb-8 p-2">
-          <View className="bg-green-400 w-full h-10 rounded-md self-start justify-center items-center"><Text>Start</Text></View>
-          <View className="bg-green-400 w-full h-10 rounded-md self-center justify-center items-center"><Text>Center</Text></View>
-          <View className="bg-green-400 w-full h-10 rounded-md self-end justify-center items-center"><Text>End</Text></View>
-        </Grid>
-
-
-        {/* SECTION 3: ORDERING */}
-        <Text style={styles.sectionTitle}>3. Ordering</Text>
-        <Text style={styles.sectionDesc}>
-          order-first, order-last, order-{'{'}n{'}'}
+          <Text className="font-mono">grid-cols-[16]</Text>, <Text className="font-mono">gap-[2px]</Text>, <Text className="font-mono">order-last</Text>
         </Text>
 
-        <Grid className="grid grid-cols-3 gap-3 mb-8">
-          <View className="bg-slate-300 h-20 rounded-lg justify-center items-center order-last">
-            <Text style={styles.cardTitle}>1 (Last)</Text>
-          </View>
-          <View className="bg-slate-400 h-20 rounded-lg justify-center items-center">
-            <Text style={styles.cardTitle}>2</Text>
-          </View>
-          <View className="bg-slate-800 h-20 rounded-lg justify-center items-center order-first">
-            <Text style={[styles.cardTitle, styles.textWhite]}>3 (First)</Text>
-          </View>
-        </Grid>
-
-
-        {/* SECTION 4: MASONRY / MIXED */}
-        <Text style={styles.sectionTitle}>4. Complex Dashboard</Text>
-        <Grid className="grid grid-cols-4 gap-3">
-          <View className="col-span-2 row-span-2 bg-indigo-600 rounded-2xl p-4 justify-between">
-            <Text style={[styles.cardTitle, styles.textWhite]}>Revenue</Text>
-            <Text style={[styles.cardValueLarge, styles.textWhite]}>$50k</Text>
-          </View>
-
-          <Card title="Users" value="2.1k" className="col-span-1" />
-          <Card title="Bounce" value="12%" className="col-span-1" />
-
-          <View className="col-span-2 bg-pink-500 rounded-2xl p-4 justify-center">
-            <Text style={[styles.cardTitle, styles.textWhite]}>Campaign Active</Text>
+        <Grid className="grid grid-cols-[16] gap-[2px] bg-slate-200 p-[2px] rounded-lg mb-12 overflow-hidden">
+          {/* 16 Column Heatmap style grid */}
+          {Array.from({ length: 32 }).map((_, i) => (
+            <View
+              key={i}
+              className={`h-4 col-span-1 rounded-sm ${i % 3 === 0 ? 'bg-emerald-500' : 'bg-slate-300'} ${i === 31 ? 'order-first bg-red-500' : ''}`}
+            />
+          ))}
+          <View className="col-span-16 bg-white p-2 items-center">
+            <Text className="text-slate-500 text-xs">The red block is `order-first` but logically last.</Text>
           </View>
         </Grid>
 
-        <View style={{ height: 50 }} />
+
+        {/* 4. ANALYTICS DASHBOARD (Complex) */}
+        <Text style={styles.sectionTitle}>4. SaaS Dashboard</Text>
+
+        <Grid className="grid grid-cols-3 gap-3">
+          {/* MRR Card */}
+          <View className="col-span-3 bg-slate-900 rounded-lg p-5">
+            <Text className="text-slate-400 font-medium">Monthly Recurring Revenue</Text>
+            <View className="flex-row items-baseline gap-2 mt-1">
+              <Text className="text-white text-3xl font-bold">$124,592</Text>
+              <Text className="text-green-400 font-medium text-sm">+2.4%</Text>
+            </View>
+            <View className="h-24 flex-row items-end gap-2 mt-4">
+              {[40, 60, 45, 80, 55, 75, 90, 65, 85].map((h, i) => (
+                <View key={i} style={{ height: `${h}%` }} className="flex-1 bg-slate-700 rounded-t-sm hover:bg-indigo-500" />
+              ))}
+            </View>
+          </View>
+
+          {/* Quick Actions */}
+          <View className="col-span-1 bg-white p-4 rounded-xl items-center justify-center shadow-sm gap-2">
+            <View className="w-10 h-10 bg-blue-100 rounded-full items-center justify-center">
+              <Text className="text-blue-600 text-lg">⊕</Text>
+            </View>
+            <Text className="text-xs font-bold text-slate-600">Add User</Text>
+          </View>
+          <View className="col-span-1 bg-white p-4 rounded-xl items-center justify-center shadow-sm gap-2">
+            <View className="w-10 h-10 bg-orange-100 rounded-full items-center justify-center">
+              <Text className="text-orange-600 text-lg">⚡</Text>
+            </View>
+            <Text className="text-xs font-bold text-slate-600">Upgrade</Text>
+          </View>
+          <View className="col-span-1 bg-white p-4 rounded-xl items-center justify-center shadow-sm gap-2">
+            <View className="w-10 h-10 bg-purple-100 rounded-full items-center justify-center">
+              <Text className="text-purple-600 text-lg">⚙</Text>
+            </View>
+            <Text className="text-xs font-bold text-slate-600">Settings</Text>
+          </View>
+        </Grid>
+
+        <View style={{ height: 100 }} />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-const Key = ({
-  label,
-  type,
-  style: styleProp,
-}: {
-  label: string | number;
-  type: 'num' | 'op' | 'func';
-  style?: any;
-}) => {
-  let style = styles.key;
-  let textStyle = styles.keyText;
-  if (type === 'op') {
-    style = styles.keyOp;
-    textStyle = styles.keyTextWhite;
-  } else if (type === 'func') {
-    style = styles.keyFunc;
-    textStyle = styles.keyTextBlack;
-  }
-
-  return (
-    <View style={[style, styleProp]}>
-      <Text style={textStyle}>{label}</Text>
-    </View>
-  );
-};
-
-const ImagePlaceholder = ({ height, color, className, text, style }: any) => (
-  <View
-    className={className}
-    style={[styles.imagePlace, { height, backgroundColor: color }, style]}
-  >
-    <Text style={styles.imageText}>{text || 'Img'}</Text>
-  </View>
-);
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F1F5F9', // Slate 100
+    backgroundColor: '#F8FAFC', // Slate 50
   },
   container: {
     padding: 24,
@@ -168,38 +191,34 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: '800',
+    fontWeight: '900',
     color: colors.dark,
     letterSpacing: -1,
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 16,
     color: colors.textLight,
-    marginTop: 4,
-    fontWeight: '500',
+    marginTop: 8,
+    lineHeight: 24,
   },
   sectionTitle: {
-    fontSize: 22,
-    fontWeight: '700',
+    fontSize: 20,
+    fontWeight: '800',
     color: colors.dark,
     marginTop: 10,
-    marginBottom: 4,
+    marginBottom: 6,
+    letterSpacing: -0.5,
   },
   sectionDesc: {
     fontSize: 14,
     color: colors.textLight,
     marginBottom: 20,
+    lineHeight: 20,
   },
-  divider: {
-    height: 1,
-    backgroundColor: '#CBD5E1',
-    marginVertical: 32,
-  },
-
   // Cards
   card: {
     backgroundColor: colors.card,
-    borderRadius: 20,
+    borderRadius: 10,
     padding: 20,
     justifyContent: 'space-between',
     shadowColor: '#000',
@@ -209,10 +228,6 @@ const styles = StyleSheet.create({
     elevation: 2,
     minHeight: 100,
   },
-  bgPrimary: { backgroundColor: colors.primary },
-  bgSecondary: { backgroundColor: colors.secondary },
-  bgDark: { backgroundColor: colors.dark },
-
   cardTitle: {
     fontSize: 14,
     fontWeight: '600',
@@ -226,97 +241,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.dark,
   },
-  cardValueLarge: {
-    fontSize: 42,
-    fontWeight: '800',
-    color: colors.dark,
-  },
-  cardSub: {
-    marginTop: 8,
-    fontSize: 14,
-    color: colors.textLight,
-  },
-  textWhite: { color: 'white' },
-  textWhiteOpac: { color: 'rgba(255,255,255,0.7)' },
-
-  // Graph
-  graphContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    height: 100,
-    gap: 12,
-    marginTop: 10,
-  },
-  bar: {
-    flex: 1,
-    backgroundColor: '#334155',
-    borderRadius: 4,
-  },
-
-  // Calculator
-  calculatorShell: {
-    backgroundColor: '#000',
-    borderRadius: 30,
-    padding: 20,
-    paddingBottom: 30,
-  },
-  screen: {
-    height: 80,
-    justifyContent: 'flex-end',
-    alignItems: 'flex-end',
-    marginBottom: 20,
-    paddingHorizontal: 10,
-  },
-  screenText: {
-    color: 'white',
-    fontSize: 48,
-    fontWeight: '300',
-  },
-  key: {
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: '#333',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  keyOp: {
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: colors.warning,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  keyFunc: {
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: '#A5A5A5',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  keyZero: {
-    width: '100%', // Handled by Grid actually
-    alignItems: 'flex-start',
-    paddingLeft: 30,
-  },
-  keyText: { color: 'white', fontSize: 28, fontWeight: '500' },
-  keyTextBlack: { color: 'black', fontSize: 28, fontWeight: '500' },
-  keyTextWhite: { color: 'white', fontSize: 32, fontWeight: '500' },
-
-  // Gallery
-  imagePlace: {
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  imageText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 18,
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
-  },
-
   iconContainer: { position: 'absolute', right: 15, top: 15 },
   icon: { fontSize: 20 },
 });

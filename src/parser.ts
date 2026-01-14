@@ -181,6 +181,34 @@ export function parseGridClasses(className?: string): GridSpec {
         spec.justifyItems = val as any;
       }
     }
+    // place-content: {align-content} {justify-content}
+    if (cls.startsWith('place-content-')) {
+      const val = cls.replace('place-content-', '');
+      const mappedJustify = mapJustifyContent(val);
+      const mappedAlign = mapAlignContent(val);
+      if (mappedJustify) spec.justifyContent = mappedJustify as any;
+      if (mappedAlign) spec.alignContent = mappedAlign as any;
+    }
+    // place-items: {align-items} {justify-items}
+    if (cls.startsWith('place-items-')) {
+      const val = cls.replace('place-items-', '');
+      // Mapping for items is slightly disparate (align-items vs justify-items)
+      // align-items supports baseline/flex-start... justify supports start/end...
+
+      // Handle safe subsets
+      if (['center', 'stretch'].includes(val)) {
+        spec.alignItems = val as any;
+        spec.justifyItems = val as any;
+      }
+      if (val === 'start') {
+        spec.alignItems = 'flex-start';
+        spec.justifyItems = 'start';
+      }
+      if (val === 'end') {
+        spec.alignItems = 'flex-end';
+        spec.justifyItems = 'end';
+      }
+    }
   });
 
   return spec;
@@ -234,6 +262,17 @@ export function parseItemClasses(className?: string): ItemSpec {
     if (cls.startsWith('justify-self-')) {
       const val = cls.replace('justify-self-', '');
       if (['auto', 'start', 'end', 'center', 'stretch'].includes(val)) {
+        spec.justifySelf = val as any;
+      }
+    }
+    // place-self: {align-self} {justify-self}? 
+    // Tailwind shortcuts: place-self-center -> align-self: center, justify-self: center
+    // place-self-start -> start start
+    if (cls.startsWith('place-self-')) {
+      const val = cls.replace('place-self-', '');
+      // Common values shortcut
+      if (['auto', 'start', 'end', 'center', 'stretch'].includes(val)) {
+        spec.alignSelf = mapAlignSelf(val) as any;
         spec.justifySelf = val as any;
       }
     }
