@@ -1,0 +1,37 @@
+# Grid Template Columns
+
+Utilities for specifying the columns in a grid layout.
+
+## Usage
+
+Use `grid-cols-{n}` to create a grid with `n` equally sized columns.
+
+```tsx
+<Grid className="grid-cols-4 gap-4">
+  <View className="bg-blue-200">01</View>
+  <View className="bg-blue-200">02</View>
+  <View className="bg-blue-200">03</View>
+  <View className="bg-blue-200">04</View>
+  <View className="bg-blue-200">05</View>
+  <View className="bg-blue-200">06</View>
+</Grid>
+```
+
+## Arbitrary Values (Complex Tracks)
+
+You can define custom column tracks using the bracket syntax `grid-cols-[...]`. This supports:
+- **Pixels**: `100px`
+- **Fractions**: `1fr`, `2fr`
+- **Percentage**: `25%`
+- **Auto**: `auto`
+
+```tsx
+/* Three columns: 100px fixed, remainder split 1:2 */
+<Grid className="grid-cols-[100px_1fr_2fr]">
+  {/* ... items ... */}
+</Grid>
+```
+
+## Subgrid
+
+Use `grid-cols-subgrid` to make a child grid inherit the columns of its parent. See [Subgrid Guide](/docs/advanced/subgrid).

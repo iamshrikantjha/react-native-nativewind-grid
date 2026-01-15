@@ -1,0 +1,33 @@
+# Alignment
+
+Utilities for controlling the alignment of items within the grid.
+
+## Justify Items (Horizontal)
+
+Controls alignment along the inline (row) axis.
+- `justify-items-start`
+- `justify-items-end`
+- `justify-items-center`
+- `justify-items-stretch` (default)
+
+```tsx
+<Grid className="grid-cols-3 gap-4 justify-items-center">
+  <View className="w-10 h-10 bg-orange-300" />
+  {/* ... */}
+</Grid>
+```
+
+## Align Items (Vertical)
+
+Controls alignment along the block (column) axis.
+- `items-start`
+- `items-end`
+- `items-center`
+- `items-stretch` (default)
+
+```tsx
+<Grid className="grid-cols-3 gap-4 items-center">
+  <View className="h-20 bg-green-300" />
+  <View className="h-10 bg-green-300" /> {/* Centered vertically */}
+</Grid>
+```

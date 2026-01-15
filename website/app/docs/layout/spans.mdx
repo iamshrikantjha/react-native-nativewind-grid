@@ -1,0 +1,34 @@
+# Spanning & Placement
+
+Utilities for controlling how elements span across grid columns and rows.
+
+## Column Spanning
+
+Use `col-span-{n}` to make an element span `n` columns.
+
+```tsx
+<Grid className="grid-cols-3 gap-4">
+  <View className="col-span-2 bg-red-200">Spans 2 cols</View>
+  <View className="col-span-1 bg-red-200">Spans 1 col</View>
+</Grid>
+```
+
+## Row Spanning
+
+Use `row-span-{n}` to make an element span `n` rows.
+
+```tsx
+<Grid className="grid-cols-3 grid-rows-3 h-60 gap-4">
+  <View className="row-span-3 bg-teal-200">Tall sidebar</View>
+  <View className="col-span-2 bg-teal-100">Header</View>
+  <View className="col-span-2 row-span-2 bg-teal-50">Content</View>
+</Grid>
+```
+
+## Start / End Lines
+
+We support explicit line placement:
+- `col-start-{n}`
+- `col-end-{n}`
+- `row-start-{n}`
+- `row-end-{n}`

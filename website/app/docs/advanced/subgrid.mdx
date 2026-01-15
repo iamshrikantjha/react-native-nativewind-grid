@@ -1,0 +1,23 @@
+# Visual Subgrid
+
+Inherit column tracks from the parent grid.
+
+## Usage
+
+Use `grid-cols-subgrid` on a nested grid to make it align its children to the parent's grid tracks.
+
+> **Note**: This is a "visual" subgrid implementation. It calculates the parent's track sizes and passes them down.
+
+```tsx
+<Grid className="grid-cols-4 gap-4">
+  {/* Parent items... */}
+  <View className="col-span-1">1</View>
+  
+  {/* Subgrid Container spanning 3 columns */}
+  <Grid className="col-span-3 grid-cols-subgrid gap-4">
+      <View className="bg-red-200">Child A (aligns to col 2)</View>
+      <View className="bg-red-200">Child B (aligns to col 3)</View>
+      <View className="bg-red-200">Child C (aligns to col 4)</View>
+  </Grid>
+</Grid>
+```

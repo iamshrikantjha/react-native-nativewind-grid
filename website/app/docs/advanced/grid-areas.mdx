@@ -1,0 +1,33 @@
+# Grid Areas
+
+Named grid areas for intuitive layouts.
+
+## Usage
+
+1. Define the areas on the container using `grid-areas-[...]`.
+2. Assign items to areas using `area-{name}` or `grid-area-{name}`.
+
+The syntax for `grid-areas` matches the CSS `grid-template-areas` format, but passed as an array-like arbitrary value string.
+
+```tsx
+<Grid 
+  className="grid-cols-[100px_1fr] grid-rows-[auto_1fr_auto] h-full gap-2
+  grid-areas-['header_header','sidebar_main','footer_footer']"
+>
+  <View className="area-header bg-red-200 p-4">
+    <Text>Header</Text>
+  </View>
+  
+  <View className="area-sidebar bg-blue-200 p-4">
+    <Text>Sidebar</Text>
+  </View>
+  
+  <View className="area-main bg-green-200 p-4">
+    <Text>Main Content</Text>
+  </View>
+  
+  <View className="area-footer bg-yellow-200 p-4">
+    <Text>Footer</Text>
+  </View>
+</Grid>
+```

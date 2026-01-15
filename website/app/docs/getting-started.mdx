@@ -1,0 +1,61 @@
+# Getting Started
+
+## 1. Prerequisites
+
+This library works with **React Native** (Expo or CLI) and requires **NativeWind v4** to be set up.
+
+If you haven't set up NativeWind yet, strictly follow their [installation guide](https://www.nativewind.dev/quick-starts/expo).
+
+## 2. Installation
+
+Install the package using your preferred package manager:
+
+```bash
+yarn add react-native-nativewind-grid
+# or
+npm install react-native-nativewind-grid
+```
+
+## 3. Configuration
+
+Since this library uses NativeWind, you need to ensure your `tailwind.config.js` scans the library's files to generate styles.
+
+Update your `tailwind.config.js`:
+
+```js {4}
+module.exports = {
+  content: [
+    "./App.{js,jsx,ts,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}",
+    "./node_modules/react-native-nativewind-grid/src/**/*.{ts,tsx}" // <--- Add this line
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+## 4. Basic Usage
+
+You can now import the `Grid` component and start using standard Tailwind grid classes.
+
+```tsx
+import { Grid } from 'react-native-nativewind-grid';
+import { View, Text } from 'react-native';
+
+export default function App() {
+  return (
+    <Grid className="grid-cols-3 gap-4 p-4">
+      <View className="bg-red-500 h-20 rounded" />
+      <View className="bg-green-500 h-20 rounded" />
+      <View className="bg-blue-500 h-20 rounded" />
+      <View className="col-span-3 bg-indigo-500 h-20 rounded justify-center items-center">
+        <Text className="text-white font-bold">Full Width Item</Text>
+      </View>
+    </Grid>
+  );
+}
+```
+
+That's it! You have a working Grid system. 🚀

@@ -1,0 +1,28 @@
+# Gap (Gutters)
+
+Utilities for controlling gutters between grid rows and columns.
+
+## Usage
+
+Use `gap-{n}` to change the gap between both rows and columns.
+
+```tsx
+<Grid className="grid-cols-3 gap-4">
+  <View className="bg-purple-200">01</View>
+  <View className="bg-purple-200">02</View>
+  <View className="bg-purple-200">03</View>
+</Grid>
+```
+
+## Independent Axis Control
+
+Use `gap-x-{n}` for column gaps and `gap-y-{n}` for row gaps.
+
+```tsx
+<Grid className="grid-cols-3 gap-x-8 gap-y-2">
+  <View className="bg-indigo-200">01</View>
+  <View className="bg-indigo-200">02</View>
+  <View className="bg-indigo-200">03</View>
+  <View className="bg-indigo-200">04</View>
+</Grid>
+```

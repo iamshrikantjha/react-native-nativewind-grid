@@ -1,0 +1,28 @@
+# Complex Track Sizing
+
+Mixing pixels, fractions, percentages, and auto.
+
+## Usage
+
+Standard Tailwind grid column classes (like `grid-cols-3`) create equal columns. But CSS Grid is famous for its flexibility. We support **arbitrary values** to define complex track layouts.
+
+Use the square bracket syntax: `grid-cols-[...]` or `grid-rows-[...]`.
+
+## Supported Units
+
+- **Pixels** (`px`): Fixed width. `100px`.
+- **Fractions** (`fr`): Takes up remaining space. `1fr`, `2fr`.
+- **Percentage** (`%`): Percentage of container width. `50%`.
+- **Auto** (`auto`): Fits content (be careful with this in React Native, usually behaves like `max-content`).
+
+## Examples
+
+### Sidebar Layout
+`100px` fixed sidebar, remaining space for content.
+
+```tsx
+<Grid className="grid-cols-[100px_1fr] gap-4">
+  <View className="bg-slate-800"><Text>Sidebar</Text></View>
+  <View className="bg-white"><Text>Content</Text></View>
+</Grid>
+```
