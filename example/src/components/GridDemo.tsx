@@ -121,7 +121,7 @@ export function GridDemo() {
           </View>
 
           {/* Social Link (Dark Mode) */}
-          <View className="col-span-2 bg-slate-900 rounded-3xl p-5 flex-row justify-between items-center shadow-sm">
+          <View className="col-span-2 row-span-2 flex-1 bg-slate-900 rounded-3xl p-5 flex-row justify-between shadow-sm">
             <Text className="text-white font-bold text-lg">GitHub</Text>
             <View className="w-8 h-8 rounded-full bg-white/20 items-center justify-center transform -rotate-45">
               <Text className="text-white">➜</Text>
