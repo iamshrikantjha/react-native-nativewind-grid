@@ -1,8 +1,9 @@
 // Premium Bento Grid & Modern Dashboard Demo
 // Showcasing: Bento Layouts, Complex Spans, Arbitrary Values, Alignment Shortcuts (place-*)
-import { Text, View, StyleSheet, ScrollView } from 'react-native';
+import { Text, View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Grid, VirtualGrid } from 'react-native-nativewind-grid';
+import { useState } from 'react';
 
 // Color Palette
 const colors = {
@@ -19,20 +20,81 @@ const colors = {
 };
 
 export function GridDemo() {
+  const [mode, setMode] = useState<'static' | 'virtual' | 'sticky'>('static');
+
+  const renderHeader = () => (
+    <View style={styles.header}>
+      <View className="mb-2 bg-indigo-100 self-start px-3 py-1 rounded-full border border-indigo-200">
+        <Text className="text-indigo-700 font-bold text-xs uppercase tracking-wider">v2.0 Update</Text>
+      </View>
+      <Text style={styles.title}>NativeWind Grid</Text>
+      <Text style={styles.subtitle}>
+        The ultimate layout engine for React Native.
+        <Text style={{ fontWeight: '700', color: colors.primary }}> Now with place-* shortcuts.</Text>
+      </Text>
+
+      {/* Mode Switcher */}
+      <View className="flex-row gap-2 mt-4">
+        <TouchableOpacity onPress={() => setMode('static')} className={`px-4 py-2 rounded-full ${mode === 'static' ? 'bg-indigo-600' : 'bg-slate-200'}`}>
+          <Text className={mode === 'static' ? 'text-white' : 'text-slate-700'}>Kitchen Sink</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setMode('virtual')} className={`px-4 py-2 rounded-full ${mode === 'virtual' ? 'bg-indigo-600' : 'bg-slate-200'}`}>
+          <Text className={mode === 'virtual' ? 'text-white' : 'text-slate-700'}>Virtual</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setMode('sticky')} className={`px-4 py-2 rounded-full ${mode === 'sticky' ? 'bg-indigo-600' : 'bg-slate-200'}`}>
+          <Text className={mode === 'sticky' ? 'text-white' : 'text-slate-700'}>Sticky</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  if (mode === 'virtual') {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={{ padding: 24, paddingBottom: 0 }}>
+          {renderHeader()}
+          <Text style={styles.sectionTitle}>13. Virtual Grid (Perf)</Text>
+          <Text style={styles.sectionDesc}>Renders 100 items efficiently using "root" VirtualGrid.</Text>
+        </View>
+        <VirtualGrid
+          className="grid-cols-4 gap-2 bg-slate-100 p-2 mx-4 mb-4 flex-1 rounded-xl"
+          itemClassName="h-20 items-center justify-center rounded bg-white shadow-sm"
+          data={Array.from({ length: 100 }).map((_, i) => i)}
+          renderItem={({ item }) => <Text className="font-bold text-lg text-slate-700">{item}</Text>}
+        />
+      </SafeAreaView>
+    );
+  }
+
+  if (mode === 'sticky') {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={{ padding: 24, paddingBottom: 0 }}>
+          {renderHeader()}
+          <Text style={styles.sectionTitle}>14. Sticky Rows</Text>
+          <Text style={styles.sectionDesc}>Using stickyHeaderIndices on VirtualGrid.</Text>
+        </View>
+        <VirtualGrid
+          className="grid-cols-2 gap-2 bg-slate-200 p-2 mx-4 mb-4 flex-1 rounded-xl"
+          data={['HEADER', ...Array.from({ length: 50 }).map((_, i) => `Item ${i}`)]}
+          stickyHeaderIndices={[0]}
+          renderItem={({ item }) => {
+            const isHeader = item === 'HEADER';
+            return (
+              <View className={`${isHeader ? 'col-span-2 bg-indigo-600 h-16' : 'bg-white h-24'} items-center justify-center rounded shadow-sm`}>
+                <Text className={isHeader ? 'text-white font-bold text-lg' : 'text-slate-600'}>{item}</Text>
+              </View>
+            );
+          }}
+        />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
-        {/* HERO HEADER */}
-        <View style={styles.header}>
-          <View className="mb-2 bg-indigo-100 self-start px-3 py-1 rounded-full border border-indigo-200">
-            <Text className="text-indigo-700 font-bold text-xs uppercase tracking-wider">v2.0 Update</Text>
-          </View>
-          <Text style={styles.title}>NativeWind Grid</Text>
-          <Text style={styles.subtitle}>
-            The ultimate layout engine for React Native.
-            <Text style={{ fontWeight: '700', color: colors.primary }}> Now with place-* shortcuts.</Text>
-          </Text>
-        </View>
+        {renderHeader()}
 
         {/* 1. MODERN BENTO PORTFOLIO (Trending 2024/25) */}
         <Text style={styles.sectionTitle}>1. Trending Bento Portfolio</Text>
@@ -210,11 +272,6 @@ export function GridDemo() {
           ))}
         </Grid>
 
-        {/* 5. ADVANCED CONTROL (Flow, Gap X/Y, Row Placement) */}
-        <Text style={styles.sectionTitle}>5. Advanced Control</Text>
-        <Text style={styles.sectionDesc}>
-          <Text className="font-mono">grid-flow-col</Text>, <Text className="font-mono">gap-x/y</Text>, <Text className="font-mono">row-start/end</Text>
-        </Text>
 
         {/* Grid Flow Column & Gap X/Y */}
         <Grid className="grid grid-cols-3 grid-flow-col gap-x-8 gap-y-2 mb-8 bg-slate-100 p-4 rounded-xl border border-slate-200">
@@ -378,41 +435,7 @@ export function GridDemo() {
 
         <View style={{ height: 50 }} />
 
-        {/* 13. VIRTUAL GRID (Large Data) */}
-        <Text style={styles.sectionTitle}>13. Virtual Grid (Perf)</Text>
-        <Text style={styles.sectionDesc}>
-          Renders 100 items efficiently using chunks.
-        </Text>
-        <View style={{ height: 200, marginBottom: 40 }}>
-          {/* Note: VirtualGrid needs explicit height or flex container */}
-          <VirtualGrid
-            className="grid-cols-4 gap-2 bg-slate-100 p-2"
-            itemClassName="h-10 items-center justify-center rounded bg-white shadow-sm"
-            data={Array.from({ length: 100 }).map((_, i) => i)}
-            renderItem={({ item }) => <Text>{item}</Text>}
-          />
-        </View>
-
-        {/* 14. STICKY HEADERS (Row Based) */}
-        <Text style={styles.sectionTitle}>14. Sticky Rows</Text>
-        <Text style={styles.sectionDesc}>
-          Using <Text className="font-mono">stickyHeaderIndices</Text> on VirtualGrid.
-        </Text>
-        <View style={{ height: 200 }}>
-          <VirtualGrid
-            className="grid-cols-2 gap-2 bg-slate-200 p-2"
-            data={['HEADER', ...Array.from({ length: 20 }).map((_, i) => `Item ${i}`)]}
-            stickyHeaderIndices={[0]} // Stick the first row
-            renderItem={({ item }) => {
-              const isHeader = item === 'HEADER';
-              return (
-                <View className={`${isHeader ? 'col-span-2 bg-indigo-600 h-12' : 'bg-white h-20'} items-center justify-center rounded shadow-sm`}>
-                  <Text className={isHeader ? 'text-white font-bold' : ''}>{item}</Text>
-                </View>
-              );
-            }}
-          />
-        </View>
+        <View style={{ height: 100 }} />
 
         <View style={{ height: 100 }} />
       </ScrollView>
