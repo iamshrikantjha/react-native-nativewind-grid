@@ -1,6 +1,12 @@
+export type TrackSizing =
+  | { type: 'fixed', value: number } // px (default for raw numbers in arbitrary)
+  | { type: 'fraction', value: number } // fr
+  | { type: 'percent', value: number } // %
+  | { type: 'auto' };
+
 export interface GridSpec {
-  cols: number;
-  rows?: number;
+  cols: number | TrackSizing[] | 'subgrid';
+  rows?: number | TrackSizing[]; // Future proofing
   gap: number;
   gapX?: number;
   gapY?: number;
@@ -10,6 +16,7 @@ export interface GridSpec {
   alignContent?: 'flex-start' | 'flex-end' | 'center' | 'stretch' | 'space-between' | 'space-around';
   justifyItems?: 'start' | 'end' | 'center' | 'stretch';
   alignItems?: 'flex-start' | 'flex-end' | 'center' | 'stretch' | 'baseline';
+  areas?: Record<string, { rowStart: number, colStart: number, rowSpan: number, colSpan: number }>;
 }
 
 export interface ItemSpec {
@@ -23,14 +30,84 @@ export interface ItemSpec {
   // Alignment (Item)
   justifySelf?: 'auto' | 'start' | 'end' | 'center' | 'stretch';
   alignSelf?: 'auto' | 'flex-start' | 'flex-end' | 'center' | 'stretch' | 'baseline';
+  gridArea?: string;
 }
 
 // Helpers
+const parseTrackString = (str: string): TrackSizing[] => {
+  // Split by underscore or space (common standard in Tailwind arbitrary)
+  const parts = str.split(/_| /).filter(Boolean);
+
+  return parts.map(part => {
+    if (part === 'auto') return { type: 'auto' };
+    if (part.endsWith('fr')) return { type: 'fraction', value: parseFloat(part) };
+    if (part.endsWith('%')) return { type: 'percent', value: parseFloat(part) };
+    if (part.endsWith('px')) return { type: 'fixed', value: parseFloat(part) };
+
+    const num = parseFloat(part);
+    return isNaN(num) ? { type: 'auto' } : { type: 'fixed', value: num };
+  });
+};
+
 const parseArbitrary = (cls: string, prefix: string): number | undefined => {
   if (cls.startsWith(`${prefix}[`) && cls.endsWith(']')) {
     const val = cls.slice(prefix.length + 1, -1);
     const num = parseInt(val, 10);
     return isNaN(num) ? undefined : num;
+  }
+  return undefined;
+};
+
+// Helper to parse grid-template-areas
+const parseGridAreas = (val: string): Record<string, { rowStart: number, colStart: number, rowSpan: number, colSpan: number }> => {
+  const clean = val.replace(/['"\[\]]/g, '');
+  const rows = clean.split(',').map(r => r.trim());
+
+  const areaMap: Record<string, { rMin: number, rMax: number, cMin: number, cMax: number }> = {};
+
+  rows.forEach((rowStr, rowIndex) => {
+    const cols = rowStr.split(/_| /).filter(Boolean);
+
+    cols.forEach((areaName, colIndex) => {
+      if (areaName === '.') return;
+
+      if (!areaMap[areaName]) {
+        areaMap[areaName] = {
+          rMin: rowIndex + 1,
+          rMax: rowIndex + 1,
+          cMin: colIndex + 1,
+          cMax: colIndex + 1
+        };
+      } else {
+        const entry = areaMap[areaName];
+        entry.rMin = Math.min(entry.rMin, rowIndex + 1);
+        entry.rMax = Math.max(entry.rMax, rowIndex + 1);
+        entry.cMin = Math.min(entry.cMin, colIndex + 1);
+        entry.cMax = Math.max(entry.cMax, colIndex + 1);
+      }
+    });
+  });
+
+  const result: Record<string, any> = {};
+  Object.entries(areaMap).forEach(([name, bounds]) => {
+    result[name] = {
+      rowStart: bounds.rMin,
+      colStart: bounds.cMin,
+      rowSpan: bounds.rMax - bounds.rMin + 1,
+      colSpan: bounds.cMax - bounds.cMin + 1
+    };
+  });
+
+  return result;
+};
+
+const parseArbitraryTracks = (cls: string, prefix: string): TrackSizing[] | undefined => {
+  if (cls.startsWith(`${prefix}[`) && cls.endsWith(']')) {
+    const val = cls.slice(prefix.length + 1, -1);
+    // If it looks like a complex string (has letters/units), parse as tracks
+    if (val.match(/[a-z%]/i) || val.includes('_')) {
+      return parseTrackString(val);
+    }
   }
   return undefined;
 };
@@ -48,6 +125,8 @@ const parseValue = (cls: string, prefix: string): number | undefined => {
   }
   return undefined;
 };
+
+// ... (mappings) ...
 
 // Map tailwind classes to flexbox values
 const mapJustifyContent = (val: string) => {
@@ -113,9 +192,16 @@ export function parseGridClasses(className?: string): GridSpec {
     // grid-cols
     if (cls === 'grid-cols-none') {
       spec.cols = 0; // Signal to calculator to use auto width
+    } else if (cls === 'grid-cols-subgrid') {
+      spec.cols = 'subgrid';
     } else {
-      const cols = parseValue(cls, 'grid-cols-');
-      if (cols !== undefined) spec.cols = cols;
+      const complex = parseArbitraryTracks(cls, 'grid-cols-');
+      if (complex) {
+        spec.cols = complex;
+      } else {
+        const cols = parseValue(cls, 'grid-cols-');
+        if (cols !== undefined) spec.cols = cols;
+      }
     }
 
     // grid-rows
@@ -158,6 +244,12 @@ export function parseGridClasses(className?: string): GridSpec {
         const val = parseInt(cls.replace('gap-', ''), 10);
         if (!isNaN(val)) spec.gap = val * 4;
       }
+    }
+
+    // Grid Areas
+    if (cls.startsWith('grid-areas-[')) {
+      const val = cls.slice('grid-areas-['.length, -1);
+      spec.areas = parseGridAreas(val);
     }
 
     // Flow
@@ -281,6 +373,24 @@ export function parseItemClasses(className?: string): ItemSpec {
       if (['auto', 'start', 'end', 'center', 'stretch'].includes(val)) {
         spec.alignSelf = mapAlignSelf(val) as any;
         spec.justifySelf = val as any;
+      }
+    }
+
+    // Grid Area Item
+    if (cls.startsWith('area-')) {
+      const val = cls.replace('area-', '');
+      if (val.startsWith('[') && val.endsWith(']')) {
+        spec.gridArea = val.slice(1, -1);
+      } else {
+        spec.gridArea = val;
+      }
+    }
+    if (cls.startsWith('grid-area-')) {
+      const val = cls.replace('grid-area-', '');
+      if (val.startsWith('[') && val.endsWith(']')) {
+        spec.gridArea = val.slice(1, -1);
+      } else {
+        spec.gridArea = val;
       }
     }
   });

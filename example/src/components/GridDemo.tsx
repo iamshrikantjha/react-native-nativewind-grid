@@ -2,7 +2,7 @@
 // Showcasing: Bento Layouts, Complex Spans, Arbitrary Values, Alignment Shortcuts (place-*)
 import { Text, View, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Grid } from 'react-native-nativewind-grid';
+import { Grid, VirtualGrid } from 'react-native-nativewind-grid';
 
 // Color Palette
 const colors = {
@@ -335,6 +335,84 @@ export function GridDemo() {
             </View>
           ))}
         </Grid>
+
+        {/* 10. GRID AREAS */}
+        <Text style={styles.sectionTitle}>10. Grid Areas</Text>
+        <Text style={styles.sectionDesc}>
+          Areas: 'header header' 'sidebar main' 'footer footer'
+        </Text>
+        <Grid
+          className="grid-cols-3 bg-gray-200 p-2 gap-2 h-64 rounded-xl mb-12"
+          // Using grid-areas arbitrary value
+          style={{}}
+          // @ts-ignore
+          className="grid-areas-['header_header_header','sidebar_main_main','footer_footer_footer'] grid-cols-[100px_1fr_1fr]"
+        >
+          <View className="area-header bg-indigo-400 items-center justify-center rounded"><Text className="text-white">Header</Text></View>
+          <View className="area-sidebar bg-teal-400 items-center justify-center rounded"><Text className="text-white">Sidebar</Text></View>
+          <View className="area-main bg-white items-center justify-center rounded"><Text>Main Content</Text></View>
+          <View className="area-footer bg-slate-600 items-center justify-center rounded"><Text className="text-white">Footer</Text></View>
+        </Grid>
+
+        {/* 12. SUBGRID (Visual) */}
+        <Text style={styles.sectionTitle}>12. Subgrid (Visual)</Text>
+        <Text style={styles.sectionDesc}>
+          Nested grid inherits parent tracks via <Text className="font-mono">grid-cols-subgrid</Text>.
+        </Text>
+
+        {/* Parent Grid: 3 Cols [1fr 2fr 1fr] */}
+        <Grid className="grid grid-cols-[1fr_2fr_1fr] gap-4 bg-slate-800 p-4 rounded-xl mb-12">
+          {/* 1. Normal Item */}
+          <View className="bg-slate-600 h-20 items-center justify-center rounded"><Text className="text-white">1fr</Text></View>
+
+          {/* 2. Subgrid Item Spanning 2 cols */}
+          {/* This item spans parent cols 2 and 3 (2fr and 1fr). */}
+          <Grid className="col-span-2 grid-cols-subgrid bg-slate-700 rounded p-2 gap-2">
+            <View className="bg-pink-500 h-10 items-center justify-center rounded"><Text className="text-white">Sub 1 (2fr)</Text></View>
+            <View className="bg-purple-500 h-10 items-center justify-center rounded"><Text className="text-white">Sub 2 (1fr)</Text></View>
+          </Grid>
+
+          {/* 3. New Row */}
+          <View className="col-span-3 bg-slate-600 h-10 items-center justify-center rounded"><Text className="text-white">Footer (Span 3)</Text></View>
+        </Grid>
+
+        <View style={{ height: 50 }} />
+
+        {/* 13. VIRTUAL GRID (Large Data) */}
+        <Text style={styles.sectionTitle}>13. Virtual Grid (Perf)</Text>
+        <Text style={styles.sectionDesc}>
+          Renders 100 items efficiently using chunks.
+        </Text>
+        <View style={{ height: 200, marginBottom: 40 }}>
+          {/* Note: VirtualGrid needs explicit height or flex container */}
+          <VirtualGrid
+            className="grid-cols-4 gap-2 bg-slate-100 p-2"
+            itemClassName="h-10 items-center justify-center rounded bg-white shadow-sm"
+            data={Array.from({ length: 100 }).map((_, i) => i)}
+            renderItem={({ item }) => <Text>{item}</Text>}
+          />
+        </View>
+
+        {/* 14. STICKY HEADERS (Row Based) */}
+        <Text style={styles.sectionTitle}>14. Sticky Rows</Text>
+        <Text style={styles.sectionDesc}>
+          Using <Text className="font-mono">stickyHeaderIndices</Text> on VirtualGrid.
+        </Text>
+        <View style={{ height: 200 }}>
+          <VirtualGrid
+            className="grid-cols-2 gap-2 bg-slate-200 p-2"
+            data={['HEADER', ...Array.from({ length: 20 }).map((_, i) => `Item ${i}`)]}
+            stickyHeaderIndices={[0]} // Stick the first row
+            renderItem={({ item }) => {
+              const isHeader = item === 'HEADER';
+              return (
+                <View className={`${isHeader ? 'col-span-2 bg-indigo-600 h-12' : 'bg-white h-20'} items-center justify-center rounded shadow-sm`}>
+                  <Text className={isHeader ? 'text-white font-bold' : ''}>{item}</Text>
+                </View>
+              );
+            }}
+          />
+        </View>
 
         <View style={{ height: 100 }} />
       </ScrollView>

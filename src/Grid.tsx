@@ -3,7 +3,9 @@ import React from 'react';
 import { View } from 'react-native';
 import { parseGridClasses, parseItemClasses } from './parser';
 import { computeContainerStyle, computeItemStyle } from './calculator';
-import { computeMasonryLayout } from './layout';
+import { computeMasonryLayout, computeGridLayout, type GridItem, type PlacedGridItem } from './layout';
+
+import { GridContext } from './context';
 
 export type GridProps = React.ComponentProps<typeof View> & {
     className?: string;
@@ -19,8 +21,17 @@ export function Grid({
     masonry,
     ...props
 }: GridProps) {
+    const { parentTracks } = React.useContext(GridContext);
+
     // Memoize the grid spec parsing so it only runs when className changes
-    const gridSpec = React.useMemo(() => parseGridClasses(className), [className]);
+    const gridSpec = React.useMemo(() => {
+        const spec = parseGridClasses(className);
+        // Subgrid Resolution
+        if (spec.cols === 'subgrid' && parentTracks) {
+            spec.cols = parentTracks;
+        }
+        return spec;
+    }, [className, parentTracks]);
 
     const containerStyle = React.useMemo(() => computeContainerStyle(gridSpec), [gridSpec]);
 
@@ -28,7 +39,12 @@ export function Grid({
     const content = React.useMemo(() => {
         // --- MASONRY MODE ---
         if (masonry) {
-            const cols = gridSpec.cols || 1;
+            const rawCols = gridSpec.cols || 1;
+            // Handle 'subgrid' (rare but possible if masonry nested in strict grid)
+            const cols = (rawCols === 'subgrid')
+                ? (Array.isArray(parentTracks) ? parentTracks.length : 1)
+                : (Array.isArray(rawCols) ? rawCols.length : rawCols);
+
             const gap = gridSpec.gap ?? 0;
             const gapX = gridSpec.gapX ?? gap;
             const gapY = gridSpec.gapY ?? gap;
@@ -72,14 +88,11 @@ export function Grid({
         }
 
         // --- STANDARD GRID MODE ---
-        // First Pass: Parse all children to get their specs (needed for sorting)
+        // 1. Prepare Items
         const parsedChildren = React.Children.toArray(children).map((child) => {
             if (!React.isValidElement(child)) return { child, order: 0, itemSpec: null };
-
             const props = child.props as { className?: string; style?: any };
-            const itemClassName = props.className;
-
-            const itemSpec = parseItemClasses(itemClassName);
+            const itemSpec = parseItemClasses(props.className);
             return {
                 child,
                 order: itemSpec.order ?? 0,
@@ -87,36 +100,72 @@ export function Grid({
             };
         });
 
-        // Sort by Order
+        // 2. Sort
         parsedChildren.sort((a, b) => a.order - b.order);
 
-        // Debug Logging
+        // Debug
         if (debug) {
             console.log('[NativeWindGrid] Debug Info:');
             console.log('GridSpec:', JSON.stringify(gridSpec, null, 2));
             console.log('Children Count:', parsedChildren.length);
         }
 
-        // Second Pass: Compute Styles and Render
+        // 3. Determine Layout Mode
+        const isComplex = Array.isArray(gridSpec.cols);
+        const isDense = gridSpec.autoFlow?.includes('dense');
+        const shouldUseStrictLayout = isComplex || isDense || gridSpec.rows !== undefined;
+
+        let placementMap: Record<string, PlacedGridItem> = {};
+
+        if (shouldUseStrictLayout) {
+            const layoutItems: GridItem[] = parsedChildren.map((item, idx) => ({
+                id: (item.child as any).key || idx.toString(),
+                order: item.order,
+                spec: item.itemSpec || { colSpan: 1, rowSpan: 1 },
+                originalIndex: idx
+            }));
+
+            const layoutResult = computeGridLayout(layoutItems, gridSpec, debug);
+            layoutResult.placedItems.forEach(p => {
+                placementMap[p.id] = p;
+            });
+        }
+
+        // 4. Render
         const enhancedChildren = parsedChildren.map((item, index) => {
             const { child, itemSpec } = item;
-
-            // Non-element children (text/strings/null) just pass through
             if (!itemSpec || !React.isValidElement(child)) return child;
 
-            // The Wrapper handles the Width and the Padding (Gap)
-            const itemWrapperStyle = computeItemStyle(gridSpec, itemSpec);
+            // Get resolved placement if available
+            const id = child.key || index.toString();
+            const placement = placementMap[id];
+
+            // Compute Style
+            // We pass placement info to calculator if it exists
+            const itemWrapperStyle = computeItemStyle(
+                gridSpec,
+                itemSpec,
+                placement ? { colStart: placement.colStart, colSpan: placement.colSpan } : undefined
+            );
 
             if (debug) {
-                console.log(`Item ${index}:`, JSON.stringify({ spec: itemSpec, style: itemWrapperStyle }, null, 2));
+                console.log(`Item ${index}:`, JSON.stringify({ spec: itemSpec, style: itemWrapperStyle, placement }, null, 2));
             }
 
-            // The Child is rendered INSIDE the wrapper.
-            // This ensures that background colors on the child do not bleed into the gap (padding).
-            // We use 'fragment' key or just index key since order might have changed.
+            // Subgrid Provider Logic
+            let subgridContextValue = {};
+            if (Array.isArray(gridSpec.cols) && placement) {
+                const start = placement.colStart - 1; // 0-based
+                const end = start + placement.colSpan;
+                const slicedTracks = gridSpec.cols.slice(start, end);
+                subgridContextValue = { parentTracks: slicedTracks };
+            }
+
             return (
-                <View key={child.key || index} style={[itemWrapperStyle]}>
-                    {child}
+                <View key={id} style={[itemWrapperStyle]}>
+                    <GridContext.Provider value={subgridContextValue}>
+                        {child}
+                    </GridContext.Provider>
                 </View>
             );
         });

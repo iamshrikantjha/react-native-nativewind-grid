@@ -7,7 +7,7 @@ export interface GridItem {
     originalIndex: number;
 }
 
-export interface PlacedItem {
+export interface PlacedGridItem {
     id: string;
     spec: ItemSpec;
 
@@ -20,6 +20,8 @@ export interface PlacedItem {
     // For Debug
     isImplicit?: boolean;
 }
+
+export type PlacedItem = PlacedGridItem;
 
 /**
  * Core Grid Placement Algorithm
@@ -37,7 +39,9 @@ export function computeGridLayout(
     debug: boolean = false
 ): { placedItems: PlacedItem[], totalRows: number, droppedItems: GridItem[] } {
 
-    const totalCols = gridSpec.cols || 1;
+    const totalCols = (Array.isArray(gridSpec.cols))
+        ? gridSpec.cols.length
+        : (typeof gridSpec.cols === 'number' ? gridSpec.cols : 1);
     const autoFlow = gridSpec.autoFlow || 'row';
     const isDense = autoFlow.includes('dense');
 
@@ -83,6 +87,17 @@ export function computeGridLayout(
     // Process items
     items.forEach(item => {
         const { spec } = item;
+
+        // Resolve Grid Area override
+        if (spec.gridArea && gridSpec.areas) {
+            const area = gridSpec.areas[spec.gridArea];
+            if (area) {
+                spec.rowStart = area.rowStart;
+                spec.colStart = area.colStart;
+                spec.rowSpan = area.rowSpan;
+                spec.colSpan = area.colSpan;
+            }
+        }
 
         // Default spans
         const colSpan = Math.min(spec.colSpan || 1, totalCols); // Cap span at max cols
