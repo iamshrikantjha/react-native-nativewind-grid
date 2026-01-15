@@ -1,25 +1,25 @@
 # React Native NativeWind Grid 🚀
 
-A robust, feature-rich Grid layout system for React Native, designed to work seamlessly with [NativeWind](https://www.nativewind.dev/).
+A robust, specification-compliant Grid layout system for React Native, built on top of [NativeWind v4](https://www.nativewind.dev/).
 
-Bring the power of CSS Grid to your mobile apps with a familiar API: `grid-cols`, `gap`, `col-span`, `grid-areas`, and even `masonry`.
+Unlike other grid libraries that just wrap Flexbox, this library implements a **true 2D grid algorithms** capable of handling complex layouts, masonry, and virtualization, all controllable via standard Tailwind CSS classes.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue)
-![NativeWind](https://img.shields.io/badge/NativeWind-v4/v2-cyan)
+![NativeWind](https://img.shields.io/badge/NativeWind-v4-cyan)
 
-## ✨ Features
+## ✨ Features (Working Now)
 
-- **Standard Grid**: `grid-cols-N`, `gap-N`, `gap-x/y-N`.
-- **Complex Tracks**: Arbitrary values like `grid-cols-[100px_1fr_auto]`.
-- **Spanning**: `col-span-N`, `row-span-N`.
-- **Grid Areas**: Named areas with `grid-areas-['header_header','sidebar_main']`.
-- **Masonry Layout**: True masonry support via `<Grid masonry />`.
-- **Visual Subgrid**: Nested grids inheriting parent tracks via `grid-cols-subgrid`.
-- **Virtualization**: `<VirtualGrid />` for large datasets (chunked rendering).
-- **Sticky Headers**: Sticky rows support within `VirtualGrid`.
-- **Alignment**: Full support for `justify-items`, `align-items`, `place-items`, etc.
-- **Dense Packing**: `grid-flow-row-dense` support.
+- **Standard Grid**: Full support for `grid-cols-N`, `grid-rows-N`, `gap-N`, `gap-x/y-N`.
+- **Complex Tracks**: Support for arbitrary values: `grid-cols-[100px_1fr_auto]`.
+- **Grid Areas**: Named grid areas for semantic layouts: `grid-areas-['header_header', 'sidebar_content']`.
+- **Spanning**: `col-span-N`, `row-span-N`, `col-span-full`, `row-span-full`.
+- **Masonry Layout**: True Pinterest-style masonry layout (`<Grid masonry />`) that packs items based on height.
+- **Visual Subgrid**: Nested grids that visually align with parent column tracks (`grid-cols-subgrid`).
+- **Virtualization**: `<VirtualGrid />` component for rendering thousands of items efficiently (uses `FlatList` internally).
+- **Alignment**: `justify-items`, `align-items`, `place-items`, `justify-self`, `align-self`.
+- **Dense Packing**: `grid-flow-row-dense` to fill holes in the grid automatically.
+- **Sticky Headers**: Sticky positioning support within Grids (and `stickyHeaderIndices` in VirtualGrid).
 
 ## 📦 Installation
 
@@ -29,121 +29,127 @@ yarn add react-native-nativewind-grid
 npm install react-native-nativewind-grid
 ```
 
-> **Note**: This library depends on `nativewind` being set up in your project.
+### ⚙️ Configuration (Crucial)
 
-## 🚀 Usage
+You **must** update your `tailwind.config.js` to scan this library's source files. If you skip this, no styles will apply.
 
-### 1. Basic Grid
+```js filename="tailwind.config.js" {5}
+module.exports = {
+  content: [
+    "./App.{js,jsx,ts,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}",
+    "./node_modules/react-native-nativewind-grid/src/**/*.{ts,tsx}" // <--- Add this line
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+## 🚀 Basic Usage
+
 ```tsx
 import { Grid } from 'react-native-nativewind-grid';
 import { View, Text } from 'react-native';
 
-export function Example() {
+export default function App() {
   return (
-    <Grid className="grid-cols-3 gap-4">
-      <View className="bg-red-500 h-20" />
-      <View className="bg-green-500 h-20" />
-      <View className="bg-blue-500 h-20" />
+    <Grid className="grid-cols-3 gap-4 p-4">
+      <View className="bg-red-500 h-24 rounded" />
+      <View className="bg-green-500 h-24 rounded" />
+      <View className="bg-blue-500 h-24 rounded" />
+      {/* Spanning Item */}
+      <View className="col-span-3 bg-purple-500 h-24 rounded flex items-center justify-center">
+        <Text className="text-white font-bold">I span 3 columns</Text>
+      </View>
     </Grid>
   );
 }
 ```
 
-### 2. Spans & Placement
+## 📚 Advanced Features
+
+### 1. Complex Track Sizing
+Mix fixed pixels, fractions (`fr`), percentages, and `auto` sizing.
+
 ```tsx
-<Grid className="grid-cols-3 gap-2">
-  <View className="col-span-2 bg-indigo-500 h-20" />
-  <View className="bg-pink-500 h-20" />
-  <View className="col-span-3 bg-slate-500 h-20" />
+/* Column 1: Fixed 100px
+   Column 2: Takes remaining space (1fr)
+   Column 3: Fixed 20% of container */
+<Grid className="grid-cols-[100px_1fr_20%] gap-2">
+  <View className="bg-red-200" />
+  <View className="bg-green-200" />
+  <View className="bg-blue-200" />
 </Grid>
 ```
 
-### 3. Complex Tracks (Arbitrary Values)
-Use pixel values, fractions (`fr`), percentages (`%`), or `auto`.
-```tsx
-<Grid className="grid-cols-[100px_1fr_2fr] gap-2">
-  <View className="bg-red-200"><Text>Fixed 100px</Text></View>
-  <View className="bg-green-200"><Text>1fr</Text></View>
-  <View className="bg-blue-200"><Text>2fr</Text></View>
-</Grid>
-```
+### 2. Grid Areas
+Name your areas for readability.
 
-### 4. Grid Areas
-Define named areas and assign items to them.
 ```tsx
 <Grid 
-  className="grid-cols-[100px_1fr] gap-2"
-  // Note: Pass areas via arbitrary class syntax
-  // Format: 'row1_col1 row1_col2','row2_col1 row2_col2'
-  className="grid-areas-['sidebar_header','sidebar_content']"
+  className="grid-cols-2 gap-4 grid-areas-['header_header', 'sidebar_content', 'footer_footer']"
 >
-  <View className="area-header bg-blue-500 h-16" />
-  <View className="area-sidebar bg-slate-800" />
-  <View className="area-content bg-white h-full" />
+  <View className="area-header bg-red-400 h-20" />
+  <View className="area-sidebar bg-blue-400 h-40" />
+  <View className="area-content bg-green-400 h-40" />
+  <View className="area-footer bg-yellow-400 h-20" />
 </Grid>
 ```
 
-### 5. Masonry Layout 🧱
-Pinterest-style layout. Items are placed in the shortest column.
+### 3. Masonry Layout
+Pinterest-style layout where items stack based on height rather than strict rows.
+
 ```tsx
 <Grid masonry className="grid-cols-2 gap-2">
-  {items.map((item) => (
-    <View key={item.id} style={{ height: item.randomHeight }} className="bg-slate-200" />
+  {items.map(item => (
+     <View key={item.id} style={{ height: item.randomHeight }} className="bg-slate-200 rounded" />
   ))}
 </Grid>
 ```
 
-### 6. Subgrid (Visual)
-Inherit column tracks from the parent grid.
+### 4. Visual Subgrid
+Allow nested children to align to the parent's grid tracks.
+
 ```tsx
-<Grid className="grid-cols-4 gap-4">
-  <View className="col-span-1 bg-red-500" />
-  {/* This nested grid will align perfectly with the parent's last 3 columns */}
-  <Grid className="col-span-3 grid-cols-subgrid gap-4">
-      <View className="bg-blue-500" /> {/* Aligns with col 2 */}
-      <View className="bg-blue-500" /> {/* Aligns with col 3 */}
-      <View className="bg-blue-500" /> {/* Aligns with col 4 */}
+<Grid className="grid-cols-4 gap-4 bg-gray-100 p-2">
+  <View className="col-span-1 bg-white" />
+  
+  {/* Nested grid inheriting the last 3 columns of the parent */}
+  <Grid className="col-span-3 grid-cols-subgrid gap-2 bg-blue-50">
+      <View className="bg-blue-200" /> {/* Aligns with Parent Col 2 */}
+      <View className="bg-blue-200" /> {/* Aligns with Parent Col 3 */}
+      <View className="bg-blue-200" /> {/* Aligns with Parent Col 4 */}
   </Grid>
 </Grid>
 ```
 
-### 7. VirtualGrid (Performance)
-For lists with 100+ items, use `VirtualGrid`. It chunks items into rows and renders them in a `FlatList`.
+### 5. Virtual Grid (Performance)
+Use `<VirtualGrid />` for long lists to maintain 60fps. It chunks items into rows and uses a `FlatList` under the hood.
+
 ```tsx
 import { VirtualGrid } from 'react-native-nativewind-grid';
 
 <VirtualGrid
   className="grid-cols-3 gap-2"
-  data={largeDataArray}
+  data={largeData}
   renderItem={({ item }) => <Card item={item} />}
-  itemClassName="h-32 bg-white rounded"
-  stickyHeaderIndices={[0]} // Optional: Sticky rows
+  keyExtractor={(item) => item.id}
+  stickyHeaderIndices={[0]} // Optional sticky headers
 />
 ```
 
-## ⚠️ Current Limitations (Missing Features)
+## ⚠️ Known Limitations
 
-As of v1.0, the following CSS Grid features are **not yet supported**:
+We aim for honest adherence to the spec, but React Native has differences from the web.
 
-- **`minmax()` and `repeat()`**: Track sizing supports explicit values only (e.g., `1fr`, `20%`, `100px`). `repeat(auto-fill, ...)` is not supported.
-- **Auto-Fit / Auto-Fill**: Column count must be explicit (number or array of tracks). True responsive column counting based on container width is manual (via specific media queries like `md:grid-cols-4`).
-- **Implicit Rows Sizing**: `grid-auto-rows` is not fully supported. Rows currently default to `auto` (content height).
-- **RTL**: RTL layouts logic is not explicitly enforced beyond React Native's default behavior.
-
-## 🛠 Debugging
-
-Pass the `debug` prop to see console logs about layout calculation, grid spec parsing, and placement.
-
-```tsx
-<Grid debug className="..." />
-```
+1.  **Auto-Placement (Dense)**: `grid-flow-row-dense` is supported, but `grid-flow-column` logic is currently **experimental**.
+2.  **Subgrid**: `grid-cols-subgrid` is fully supported. `grid-rows-subgrid` is **not yet supported**.
+3.  **Explicit Tracks**: You must define tracks. `minmax(100px, 1fr)` syntax is **not yet supported** (planned). Use `auto` or `fr` instead.
+4.  **VirtualGrid Limitations**: `<VirtualGrid>` optimizes by pre-grouping items into rows. It assumes items mainly span 1 column. Complex variable spanning logic inside a virtualization context is restricted. Use standard `<Grid>` for highly irregular layouts with fewer (<100) items.
+5.  **Percentage Tracks**: Deeply nested percentage tracks sometimes resolve against the screen width rather than the immediate parent if the parent has no explicit width.
 
 ## 🤝 Contributing
 
-1. Clone the repo
-2. Run `yarn install`
-3. Run `yarn example android` or `yarn example ios` to see the `GridDemo`.
-
-## 📄 License
-
-MIT
+Contributions are welcome! Please open an issue or submit a PR.
