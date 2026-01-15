@@ -276,6 +276,66 @@ export function GridDemo() {
           </View>
         </Grid>
 
+        {/* 7. GRID ROWS (New Feature) */}
+        <Text style={styles.sectionTitle}>7. Grid Rows (Explicit Height)</Text>
+        <Text style={styles.sectionDesc}>
+          <Text className="font-mono">grid-rows-3</Text> divides the container height into 3 equal rows.
+        </Text>
+
+        <Grid className="grid grid-cols-2 grid-rows-3 gap-4 h-64 bg-slate-100 p-4 rounded-xl mb-12">
+          {/* Item 1: Standard */}
+          <View className="bg-white rounded items-center justify-center shadow-sm">
+            <Text>1</Text>
+          </View>
+
+          {/* Item 2: Row Span 2 */}
+          <View className="row-span-2 bg-indigo-500 rounded items-center justify-center shadow-sm">
+            <Text className="text-white font-bold">Row Span 2</Text>
+          </View>
+
+          {/* Item 3: Col Span 1 */}
+          <View className="bg-white rounded items-center justify-center shadow-sm">
+            <Text>3</Text>
+          </View>
+
+          {/* Item 4: Col Span 2 (Bottom Row) */}
+          <View className="col-span-2 bg-emerald-500 rounded items-center justify-center shadow-sm">
+            <Text className="text-white font-bold">Col Span 2 (Row 3)</Text>
+          </View>
+        </Grid>
+
+        {/* 8. DENSE PACKING */}
+        <Text style={styles.sectionTitle}>8. Dense Packing</Text>
+        <Text style={styles.sectionDesc}>
+          <Text className="font-mono">grid-flow-row-dense</Text> backtracks to fill holes.
+        </Text>
+
+        <Grid className="grid grid-cols-3 gap-1 grid-flow-row-dense bg-slate-100 p-2 rounded-xl mb-12">
+          {/* Item 1: Span 2 */}
+          <View className="col-span-2 bg-slate-300 h-10 items-center justify-center"><Text>1 (Span 2)</Text></View>
+          {/* Item 2: Span 2 (Too big for Col 3) */}
+          <View className="col-span-2 bg-slate-300 h-10 items-center justify-center"><Text>2 (Span 2)</Text></View>
+          {/* Item 3: Span 1 (Should fill hole in R1, C3 since it's dense) */}
+          <View className="col-span-1 bg-green-400 h-10 items-center justify-center"><Text>3 (Dense Fill)</Text></View>
+          {/* Item 4 */}
+          <View className="col-span-1 bg-slate-300 h-10 items-center justify-center"><Text>4</Text></View>
+        </Grid>
+
+        {/* 9. MASONRY LAYOUT */}
+        <Text style={styles.sectionTitle}>9. Masonry Layout 🧱</Text>
+        <Text style={styles.sectionDesc}>
+          Pinterest-style multi-column layout using <Text className="font-mono">masonry</Text> prop.
+        </Text>
+
+        <Grid masonry className="grid-cols-3 gap-1 mb-12">
+          {/* Random Heights */}
+          {[40, 60, 30, 80, 50, 70, 45, 90, 35].map((h, i) => (
+            <View key={i} style={{ height: h * 2, backgroundColor: ['#FCA5A5', '#FDBA74', '#86EFAC', '#93C5FD', '#C4B5FD', '#F0ABFC'][i % 6] }} className="rounded-xl items-center justify-center shadow-sm">
+              <Text className="text-white font-bold">{i + 1}</Text>
+            </View>
+          ))}
+        </Grid>
+
         <View style={{ height: 100 }} />
       </ScrollView>
     </SafeAreaView>

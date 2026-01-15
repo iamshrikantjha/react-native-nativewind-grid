@@ -110,11 +110,22 @@ export function computeItemStyle(
     widthStyle = { width: `${widthPercentage}%` as DimensionValue };
   }
 
+  let heightStyle: ViewStyle | undefined;
+  // Backward Compatibility: Only calculate height if explicit rows are defined.
+  // Otherwise, default to content-based height (flex behavior).
+  if (gridSpec.rows && gridSpec.rows > 0) {
+    const rowSpan = itemSpec.rowSpan || 1;
+    // Calculate percentage height based on total explicit rows
+    const heightPercentage = (100 / gridSpec.rows) * rowSpan;
+    heightStyle = { height: `${heightPercentage}%` as DimensionValue };
+  }
+
   // Inner Alignment
   // ... (rest of logic)
 
   return {
     ...widthStyle,
+    ...heightStyle,
     paddingHorizontal: gapX / 2,
     paddingVertical: gapY / 2,
 

@@ -4,7 +4,7 @@ export interface GridSpec {
   gap: number;
   gapX?: number;
   gapY?: number;
-  autoFlow: 'row' | 'column';
+  autoFlow: 'row' | 'column' | 'row dense' | 'column dense';
   // Alignment (Container)
   justifyContent?: 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around' | 'space-evenly';
   alignContent?: 'flex-start' | 'flex-end' | 'center' | 'stretch' | 'space-between' | 'space-around';
@@ -162,6 +162,9 @@ export function parseGridClasses(className?: string): GridSpec {
 
     // Flow
     if (cls === 'grid-flow-col') spec.autoFlow = 'column';
+    if (cls === 'grid-flow-row-dense') spec.autoFlow = 'row dense';
+    if (cls === 'grid-flow-col-dense') spec.autoFlow = 'column dense';
+    if (cls === 'grid-flow-dense') spec.autoFlow = 'row dense'; // Default to row dense
 
     // Alignment
     if (cls.startsWith('justify-content-') || cls.startsWith('justify-')) { // loose match for content
