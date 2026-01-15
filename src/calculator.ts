@@ -44,25 +44,76 @@ export function computeContainerStyle(spec: GridSpec): ViewStyle {
 
 export function computeItemStyle(
   gridSpec: GridSpec,
-  itemSpec: ItemSpec
+  itemSpec: ItemSpec,
+  resolvedPlacement?: { colStart: number; colSpan: number }
 ): ViewStyle {
   const gap = gridSpec.gap ?? 0;
   const gapX = gridSpec.gapX ?? gap;
   const gapY = gridSpec.gapY ?? gap;
 
-  const cols = gridSpec.cols || 1;
-
-  // Span Logic: Support col-end/row-end
-  // If colEnd is present, span = colEnd - colStart (or 1 if no start)
+  // determine effective colSpan
   let colSpan = itemSpec.colSpan || 1;
-  if (itemSpec.colEnd) {
-    if (itemSpec.colStart) {
-      colSpan = itemSpec.colEnd - itemSpec.colStart;
-    }
-    // Else ignore end without start for now or assume start=1? 
-    // Simplified logic: strict grid usually requires explicit placement.
+  if (resolvedPlacement) {
+    colSpan = resolvedPlacement.colSpan;
+  } else if (itemSpec.colEnd && itemSpec.colStart) {
+    colSpan = itemSpec.colEnd - itemSpec.colStart;
   }
 
+  const cols = gridSpec.cols;
+
+  // Width Calculation
+  let widthStyle: ViewStyle | undefined;
+
+  // Complex Tracks Logic
+  if (Array.isArray(cols)) {
+    if (resolvedPlacement) {
+      // calculate width based on specific tracks
+      // resolvedPlacement.colStart is 1-based
+      const startIdx = resolvedPlacement.colStart - 1;
+      const endIdx = startIdx + colSpan;
+
+      let flexGrow = 0;
+      let pixelWidth = 0;
+      let isPercent = false;
+      let percentTotal = 0;
+
+      for (let i = startIdx; i < endIdx; i++) {
+        if (i >= cols.length) break;
+        const track = cols[i];
+        if (!track) continue; // Safety check
+
+        if (track.type === 'fraction') {
+          flexGrow += track.value;
+        } else if (track.type === 'fixed') {
+          pixelWidth += track.value;
+        } else if (track.type === 'percent') {
+          isPercent = true;
+          percentTotal += track.value;
+        } else if (track.type === 'auto') {
+          // auto logic
+        }
+      }
+
+      if (flexGrow > 0) {
+        widthStyle = { flexGrow, flexBasis: pixelWidth > 0 ? pixelWidth : 0 };
+      } else if (isPercent) {
+        widthStyle = { width: `${percentTotal}%` as DimensionValue };
+      } else if (pixelWidth > 0) {
+        widthStyle = { width: pixelWidth };
+      } else {
+        // auto fallback
+      }
+
+    } else {
+      // Fallback if no placement (shouldn't happen in strict mode)
+      widthStyle = { width: 'auto' };
+    }
+  }
+  // Simple Number Logic
+  else if (typeof cols === 'number' && cols > 0) {
+    const widthPercentage = (100 / cols) * colSpan;
+    widthStyle = { width: `${widthPercentage}%` as DimensionValue };
+  }
 
 
   // Alignment (Item Wrapper Internal Alignment)
@@ -104,10 +155,17 @@ export function computeItemStyle(
     case 'stretch': wrapperJustifyContent = 'space-between'; break;
   }
 
-  let widthStyle: ViewStyle | undefined;
-  if (cols > 0) {
-    const widthPercentage = (100 / cols) * colSpan;
-    widthStyle = { width: `${widthPercentage}%` as DimensionValue };
+  let heightStyle: ViewStyle | undefined;
+  // Backward Compatibility: Only calculate height if explicit rows are defined.
+  // Otherwise, default to content-based height (flex behavior).
+
+  // Checking rows type safely
+  const rows = gridSpec.rows;
+  if (typeof rows === 'number' && rows > 0) {
+    const rowSpan = itemSpec.rowSpan || 1;
+    // Calculate percentage height based on total explicit rows
+    const heightPercentage = (100 / rows) * rowSpan;
+    heightStyle = { height: `${heightPercentage}%` as DimensionValue };
   }
 
   // Inner Alignment
@@ -115,6 +173,7 @@ export function computeItemStyle(
 
   return {
     ...widthStyle,
+    ...heightStyle,
     paddingHorizontal: gapX / 2,
     paddingVertical: gapY / 2,
 

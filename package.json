@@ -42,6 +42,7 @@
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "test": "jest",
+    "setup": "bob build && cd example/ && adb uninstall com.example || true && yarn start --reset-cache & sleep 5 && yarn android && cd ..",
     "release": "release-it --only-version"
   },
   "keywords": [

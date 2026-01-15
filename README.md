@@ -1,31 +1,53 @@
-# React Native NativeWind Grid
+# React Native NativeWind Grid 🚀
 
-A high-performance, Flexbox-based Grid system for React Native, designed to work seamlessly with **NativeWind v4**.
+A robust, specification-compliant Grid layout system for React Native, built on top of [NativeWind v4](https://www.nativewind.dev/).
 
-It mimics CSS Grid behavior using efficient React Native primitives without runtime layout measurements (no double-renders).
+Unlike other grid libraries that just wrap Flexbox, this library implements a **true 2D grid algorithms** capable of handling complex layouts, masonry, and virtualization, all controllable via standard Tailwind CSS classes.
 
-## Features
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue)
+![NativeWind](https://img.shields.io/badge/NativeWind-v4-cyan)
 
-- **High Performance**: Zero double-renders, percentage-based layout, and memoized calculations.
-- **NativeWind Integrated**: Supports standard `className` utilities (`bg-*`, `border-*`, `shadow-*`).
-- **Complete Grid Support**:
-  - `grid-cols-{n}` / `grid-cols-[n]`
-  - `gap-{n}` / `gap-[n]`
-  - `col-span-{n}` / `row-span-{n}`
-  - `col-start-{n}` / `col-end-{n}`
-  - `order-{n}` / `order-first` / `order-last`
-- **Alignment (Box Alignment)**:
-  - Container: `justify-*`, `items-*`, `content-*`
-  - Item: `self-*`
-- **Gap Support**: True visual gaps using padding wrappers (works with child backgrounds).
+## ✨ Features (Working Now)
 
-## Installation
+- **Standard Grid**: Full support for `grid-cols-N`, `grid-rows-N`, `gap-N`, `gap-x/y-N`.
+- **Complex Tracks**: Support for arbitrary values: `grid-cols-[100px_1fr_auto]`.
+- **Grid Areas**: Named grid areas for semantic layouts: `grid-areas-['header_header', 'sidebar_content']`.
+- **Spanning**: `col-span-N`, `row-span-N`, `col-span-full`, `row-span-full`.
+- **Masonry Layout**: True Pinterest-style masonry layout (`<Grid masonry />`) that packs items based on height.
+- **Visual Subgrid**: Nested grids that visually align with parent column tracks (`grid-cols-subgrid`).
+- **Virtualization**: `<VirtualGrid />` component for rendering thousands of items efficiently (uses `FlatList` internally).
+- **Alignment**: `justify-items`, `align-items`, `place-items`, `justify-self`, `align-self`.
+- **Dense Packing**: `grid-flow-row-dense` to fill holes in the grid automatically.
+- **Sticky Headers**: Sticky positioning support within Grids (and `stickyHeaderIndices` in VirtualGrid).
+
+## 📦 Installation
 
 ```bash
 yarn add react-native-nativewind-grid
+# or
+npm install react-native-nativewind-grid
 ```
 
-## Usage
+### ⚙️ Configuration (Crucial)
+
+You **must** update your `tailwind.config.js` to scan this library's source files. If you skip this, no styles will apply.
+
+```js filename="tailwind.config.js" {5}
+module.exports = {
+  content: [
+    "./App.{js,jsx,ts,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}",
+    "./node_modules/react-native-nativewind-grid/src/**/*.{ts,tsx}" // <--- Add this line
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+## 🚀 Basic Usage
 
 ```tsx
 import { Grid } from 'react-native-nativewind-grid';
@@ -33,33 +55,101 @@ import { View, Text } from 'react-native';
 
 export default function App() {
   return (
-    <Grid className="grid grid-cols-3 gap-4">
-      {/* Span 2 Columns */}
-      <View className="col-span-2 bg-blue-500 h-20" />
-      
-      {/* Ordinary Cell */}
-      <View className="bg-red-500 h-20" />
-      
-      {/* Arbitrary Value & Placement */}
-      <View className="col-start-1 col-end-3 bg-green-500 h-20" />
-      
-      {/* Ordering */}
-      <View className="order-last bg-purple-500 h-20" />
+    <Grid className="grid-cols-3 gap-4 p-4">
+      <View className="bg-red-500 h-24 rounded" />
+      <View className="bg-green-500 h-24 rounded" />
+      <View className="bg-blue-500 h-24 rounded" />
+      {/* Spanning Item */}
+      <View className="col-span-3 bg-purple-500 h-24 rounded flex items-center justify-center">
+        <Text className="text-white font-bold">I span 3 columns</Text>
+      </View>
     </Grid>
   );
 }
 ```
 
-## Props
+## 📚 Advanced Features
 
-| Prop | Type | Description |
-| h--- | --- | --- |
-| `className` | `string` | Tailwind classes string. |
-| `style` | `ViewStyle` | Standard React Native style object. |
-| `debug` | `boolean` | If true, logs parsing and calculation info to console. |
-| `children` | `ReactNode` | Grid items. |
+### 1. Complex Track Sizing
+Mix fixed pixels, fractions (`fr`), percentages, and `auto` sizing.
 
-## Limitations
+```tsx
+/* Column 1: Fixed 100px
+   Column 2: Takes remaining space (1fr)
+   Column 3: Fixed 20% of container */
+<Grid className="grid-cols-[100px_1fr_20%] gap-2">
+  <View className="bg-red-200" />
+  <View className="bg-green-200" />
+  <View className="bg-blue-200" />
+</Grid>
+```
 
-- **`row-span`**: In the current Flexbox-based architecture, `row-span` **does not affect height**. Height is determined strictly by content. `row-span` acts as a placeholder for potential future functionality but currently has no visual effect on height.
-- **`grid-flow-dense`**: Dense packing is not supported. Items naturally flow in 'row' order.
+### 2. Grid Areas
+Name your areas for readability.
+
+```tsx
+<Grid 
+  className="grid-cols-2 gap-4 grid-areas-['header_header', 'sidebar_content', 'footer_footer']"
+>
+  <View className="area-header bg-red-400 h-20" />
+  <View className="area-sidebar bg-blue-400 h-40" />
+  <View className="area-content bg-green-400 h-40" />
+  <View className="area-footer bg-yellow-400 h-20" />
+</Grid>
+```
+
+### 3. Masonry Layout
+Pinterest-style layout where items stack based on height rather than strict rows.
+
+```tsx
+<Grid masonry className="grid-cols-2 gap-2">
+  {items.map(item => (
+     <View key={item.id} style={{ height: item.randomHeight }} className="bg-slate-200 rounded" />
+  ))}
+</Grid>
+```
+
+### 4. Visual Subgrid
+Allow nested children to align to the parent's grid tracks.
+
+```tsx
+<Grid className="grid-cols-4 gap-4 bg-gray-100 p-2">
+  <View className="col-span-1 bg-white" />
+  
+  {/* Nested grid inheriting the last 3 columns of the parent */}
+  <Grid className="col-span-3 grid-cols-subgrid gap-2 bg-blue-50">
+      <View className="bg-blue-200" /> {/* Aligns with Parent Col 2 */}
+      <View className="bg-blue-200" /> {/* Aligns with Parent Col 3 */}
+      <View className="bg-blue-200" /> {/* Aligns with Parent Col 4 */}
+  </Grid>
+</Grid>
+```
+
+### 5. Virtual Grid (Performance)
+Use `<VirtualGrid />` for long lists to maintain 60fps. It chunks items into rows and uses a `FlatList` under the hood.
+
+```tsx
+import { VirtualGrid } from 'react-native-nativewind-grid';
+
+<VirtualGrid
+  className="grid-cols-3 gap-2"
+  data={largeData}
+  renderItem={({ item }) => <Card item={item} />}
+  keyExtractor={(item) => item.id}
+  stickyHeaderIndices={[0]} // Optional sticky headers
+/>
+```
+
+## ⚠️ Known Limitations
+
+We aim for honest adherence to the spec, but React Native has differences from the web.
+
+1.  **Auto-Placement (Dense)**: `grid-flow-row-dense` is supported, but `grid-flow-column` logic is currently **experimental**.
+2.  **Subgrid**: `grid-cols-subgrid` is fully supported. `grid-rows-subgrid` is **not yet supported**.
+3.  **Explicit Tracks**: You must define tracks. `minmax(100px, 1fr)` syntax is **not yet supported** (planned). Use `auto` or `fr` instead.
+4.  **VirtualGrid Limitations**: `<VirtualGrid>` optimizes by pre-grouping items into rows. It assumes items mainly span 1 column. Complex variable spanning logic inside a virtualization context is restricted. Use standard `<Grid>` for highly irregular layouts with fewer (<100) items.
+5.  **Percentage Tracks**: Deeply nested percentage tracks sometimes resolve against the screen width rather than the immediate parent if the parent has no explicit width.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please open an issue or submit a PR.

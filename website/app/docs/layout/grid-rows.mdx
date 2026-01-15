@@ -1,0 +1,20 @@
+# Grid Template Rows
+
+Utilities for specifying the rows in a grid layout.
+
+## Usage
+
+Use `grid-rows-{n}` to create a grid with `n` equally sized rows. This is primarily useful when you want to constrain the grid to a specific height and divide it vertically.
+
+```tsx
+/* A 200px tall grid divided into 2 equal rows */
+<Grid className="h-[200px] grid-rows-2 grid-flow-col gap-4">
+  <View className="bg-pink-200">01</View>
+  <View className="bg-pink-200">02</View>
+  <View className="bg-pink-200">03</View>
+</Grid>
+```
+
+## Explicit Height Required
+
+Unlike the web where `grid-rows` can imply content restrictions, in React Native you typically need to ensure the container has a defined height (via `h-{value}` or `flex-1`) for `grid-rows` to effectively split that available space.

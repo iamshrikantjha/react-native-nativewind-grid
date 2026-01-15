@@ -1,0 +1,15 @@
+# Masonry Layout
+
+Pinterest-style standard masonry layout.
+
+## Usage
+
+Add the `masonry` prop.
+
+```tsx
+<Grid masonry className="grid-cols-2 gap-4">
+  {items.map(item => (
+     <View key={item.id} style={{ height: item.randomHeight }} className="bg-white rounded" />
+  ))}
+</Grid>
+```

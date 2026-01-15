@@ -1,0 +1,24 @@
+# Dense Packing
+
+Optimizing space usage with `grid-flow-row-dense`.
+
+## Usage
+
+Add `grid-flow-row-dense` to your container.
+
+```tsx
+<Grid className="grid-cols-3 gap-1 grid-flow-row-dense">
+  {/* Item 1: Big item */}
+  <View className="col-span-2 bg-red-200 h-20">1</View>
+
+  {/* Item 2: Another Big Item (Must wrap to next row) */}
+  <View className="col-span-2 bg-red-200 h-20">2</View>
+  
+  {/* HOLE CREATED at Row 1, Col 3! */}
+  
+  {/* Item 3: Small item */}
+  {/* Without 'dense', this would go to Row 2, Col 3. */}
+  {/* WITH 'dense', this jumps back to fill Row 1, Col 3. */}
+  <View className="col-span-1 bg-green-200 h-20">3 (Fills Hole)</View>
+</Grid>
+```
