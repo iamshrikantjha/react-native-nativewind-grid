@@ -170,6 +170,21 @@ export function Grid({
             );
         });
 
+        // 5. Final Sort for Visual Layout (Critical for Dense & Start/End reordering)
+        // We must re-order the views themselves so Flexbox lays them out in the correct Grid order.
+        enhancedChildren.sort((a: any, b: any) => {
+            const idA = a.key;
+            const idB = b.key;
+            const pA = placementMap[idA];
+            const pB = placementMap[idB];
+
+            if (!pA || !pB) return 0;
+
+            // Row major order
+            if (pA.rowStart !== pB.rowStart) return pA.rowStart - pB.rowStart;
+            return pA.colStart - pB.colStart;
+        });
+
         return (
             <View
                 style={[containerStyle, style, { gap: 0, rowGap: 0, columnGap: 0 }]}

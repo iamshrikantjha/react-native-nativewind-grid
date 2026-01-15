@@ -438,6 +438,35 @@ export function GridDemo() {
         <View style={{ height: 100 }} />
 
         <View style={{ height: 100 }} />
+
+
+
+
+
+
+
+        {/* 13. Dense Packing */}
+        <Text style={styles.sectionTitle}>13. Dense Packing</Text>
+        <Text style={styles.sectionDesc}>
+          <Text className="font-mono">grid-flow-row-dense</Text> backtracks to fill holes.
+        </Text>
+        <Grid debug className="grid grid-flow-row-dense grid-cols-3 grid-rows-3 gap-2">
+          <View className="col-span-2 bg-red-200 h-10 items-center justify-center">
+            <Text>01</Text>
+          </View>
+          <View className="col-span-2 bg-red-200 h-10 items-center justify-center">
+            <Text>02</Text>
+          </View>
+          <View className="bg-red-200 h-10 items-center justify-center">
+            <Text>03</Text>
+          </View>
+          <View className="bg-red-200 h-10 items-center justify-center">
+            <Text>04</Text>
+          </View>
+          <View className="bg-red-200 h-10 items-center justify-center">
+            <Text>05</Text>
+          </View>
+        </Grid>
       </ScrollView>
     </SafeAreaView>
   );

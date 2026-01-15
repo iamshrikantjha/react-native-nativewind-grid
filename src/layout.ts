@@ -100,11 +100,55 @@ export function computeGridLayout(
         }
 
         // Default spans
-        const colSpan = Math.min(spec.colSpan || 1, totalCols); // Cap span at max cols
-        const rowSpan = spec.rowSpan || 1;
+        // Default spans (initial read)
+        let colSpan = Math.min(spec.colSpan || 1, totalCols);
+        let rowSpan = spec.rowSpan || 1;
 
         let targetRow = -1;
         let targetCol = -1;
+
+        // --- RESOLVE SPANS & STARTS FROM ENDS ---
+        // 1. Column Logic
+        if (spec.colEnd !== undefined) {
+            if (spec.colStart !== undefined) {
+                // Both Start & End -> Explicit Span
+                // defined: col-start-2 col-end-5
+                // span = 5 - 2 = 3
+                const s = spec.colStart - 1; // 0-based
+                const e = spec.colEnd - 1;   // 0-based
+                if (e > s) {
+                    item.spec.colSpan = e - s;     // Overwrite span
+                }
+            } else {
+                // End only -> Back calc Start
+                // valid: col-end-4 col-span-2 -> start = 4 - 2 = 2
+                // valid: col-end-4 (default span 1) -> start = 3
+                const e = spec.colEnd - 1;
+                const span = item.spec.colSpan || 1;
+                item.spec.colStart = (e - span) + 1; // Convert back to 1-based for consistent logic below
+            }
+        }
+
+        // 2. Row Logic
+        if (spec.rowEnd !== undefined) {
+            if (spec.rowStart !== undefined) {
+                // Both
+                const s = spec.rowStart - 1;
+                const e = spec.rowEnd - 1;
+                if (e > s) {
+                    item.spec.rowSpan = e - s;
+                }
+            } else {
+                // End only
+                const e = spec.rowEnd - 1;
+                const span = item.spec.rowSpan || 1;
+                item.spec.rowStart = (e - span) + 1;
+            }
+        }
+
+        // Re-read potentially updated values
+        colSpan = Math.min(item.spec.colSpan || 1, totalCols);
+        rowSpan = item.spec.rowSpan || 1;
 
         // CASE 1: Explicit Placement (Both defined)
         if (spec.rowStart !== undefined && spec.colStart !== undefined) {
