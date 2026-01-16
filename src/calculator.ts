@@ -175,7 +175,9 @@ export function computeItemStyle(
     case 'flex-start': wrapperJustifyContent = 'flex-start'; break;
     case 'flex-end': wrapperJustifyContent = 'flex-end'; break;
     case 'center': wrapperJustifyContent = 'center'; break;
-    case 'stretch': wrapperJustifyContent = 'space-between'; break;
+    case 'stretch': wrapperJustifyContent = 'flex-start'; break; // Default to start, children maximize height via flex/height:100% naturally if needed
+    case 'baseline': wrapperJustifyContent = 'flex-start'; break; // Approximate baseline
+    default: wrapperJustifyContent = 'flex-start'; // Default behavior
   }
 
   let heightStyle: ViewStyle | undefined;

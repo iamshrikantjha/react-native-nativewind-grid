@@ -101,8 +101,12 @@ export function GridDemo() {
         <Text style={styles.sectionDesc}>
           Mixed content types, rounded corners, complex spans.
         </Text>
+        <Text className="text-xs text-slate-500 mb-2 font-mono mx-2">
+          grid-cols-4 | col-span-2 | row-span-2 | gap-4
+        </Text>
 
         <Grid className="grid grid-cols-4 gap-4 mb-12">
+          {/* ... existing content ... */}
           {/* Profile Large */}
           <View className="col-span-2 row-span-2 bg-white rounded-3xl p-5 shadow-sm justify-between">
             <View className="flex-row items-center gap-3">
@@ -155,8 +159,12 @@ export function GridDemo() {
         <Text style={styles.sectionDesc}>
           Using <Text className="font-mono text-purple-600 bg-purple-100 px-1 rounded">place-items-center</Text> shorthands.
         </Text>
+        <Text className="text-xs text-slate-500 mb-2 font-mono mx-2">
+          place-items-center | place-content-between | place-self-end
+        </Text>
 
         <Grid className="grid grid-cols-2 gap-4 h-48 mb-12">
+          {/* ... existing content ... */}
           {/* Box 1: place-items-center (Centers both X and Y) */}
           <View className="bg-white rounded-lg place-items-center shadow-sm border border-slate-100">
             <View className="w-8 h-8 bg-purple-500 rounded-full shadow-lg" />
@@ -178,7 +186,10 @@ export function GridDemo() {
         {/* 3. ARBITRARY VALUES & ORDER */}
         <Text style={styles.sectionTitle}>3. Arbitrary & Order</Text>
         <Text style={styles.sectionDesc}>
-          <Text className="font-mono">grid-cols-[16]</Text>, <Text className="font-mono">gap-[2px]</Text>, <Text className="font-mono">order-last</Text>
+          Custom pixel values and visual reordering.
+        </Text>
+        <Text className="text-xs text-slate-500 mb-2 font-mono mx-2">
+          grid-cols-[16] | gap-[2px] | order-first | order-last
         </Text>
 
         <Grid className="grid grid-cols-[16] gap-[2px] bg-slate-200 p-[2px] rounded-lg mb-12 overflow-hidden">
@@ -197,7 +208,9 @@ export function GridDemo() {
 
         {/* 4. ANALYTICS DASHBOARD (Complex) */}
         <Text style={styles.sectionTitle}>4. SaaS Dashboard</Text>
-
+        <Text className="text-xs text-slate-500 mb-2 font-mono mx-2">
+          col-span-3 | col-span-1 | flex-row | items-baseline
+        </Text>
         <Grid className="grid grid-cols-3 gap-3">
           {/* MRR Card */}
           <View className="col-span-3 bg-slate-900 rounded-lg p-5">

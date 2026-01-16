@@ -319,6 +319,12 @@ export function parseGridClasses(className?: string): GridSpec {
       const mapped = mapAlignContent(val);
       if (mapped) spec.alignContent = mapped as any;
     }
+    // New: Support content-* shorthand (e.g. content-center -> align-content: center)
+    if (cls.startsWith('content-')) {
+      const val = cls.replace('content-', '');
+      const mapped = mapAlignContent(val);
+      if (mapped) spec.alignContent = mapped as any;
+    }
     if (cls.startsWith('items-') || cls.startsWith('align-items-')) {
       const val = cls.replace(/^(items-|align-items-)/, '');
       const mapped = mapAlignItems(val);
