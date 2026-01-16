@@ -146,39 +146,51 @@ export function computeItemStyle(
   // Resolve effective values (Self overrides Container)
 
   // Inline Axis (Horizontal)
-  const justify = itemSpec.justifySelf && itemSpec.justifySelf !== 'auto'
+  // Default to 'stretch' if not specified, matching CSS Grid default behavior for normal flow
+  const justify = (itemSpec.justifySelf && itemSpec.justifySelf !== 'auto')
     ? itemSpec.justifySelf
-    : gridSpec.justifyItems; // Inherit container justify-items
+    : (gridSpec.justifyItems || 'stretch');
 
   // Block Axis (Vertical)
-  const align = itemSpec.alignSelf && itemSpec.alignSelf !== 'auto'
+  const align = (itemSpec.alignSelf && itemSpec.alignSelf !== 'auto')
     ? itemSpec.alignSelf
-    : undefined;
+    : (gridSpec.alignItems || 'stretch');
 
-  // Let's implement Inner Alignment on Wrapper:
+
   // Wrapper is Flex Column.
-  // Horizontal Center = alignItems: center
-  // Vertical Center   = justifyContent: center
-
-  let wrapperAlignItems: ViewStyle['alignItems']; // Horizontal
+  // Horizontal Alignment (Grid Justify) -> alignItems
+  let wrapperAlignItems: ViewStyle['alignItems'];
   switch (justify) {
     case 'start': wrapperAlignItems = 'flex-start'; break;
     case 'end': wrapperAlignItems = 'flex-end'; break;
     case 'center': wrapperAlignItems = 'center'; break;
     case 'stretch': wrapperAlignItems = 'stretch'; break;
+    default: wrapperAlignItems = 'stretch'; break;
   }
 
-  let wrapperJustifyContent: ViewStyle['justifyContent']; // Vertical
-
-  const effectiveAlign = align || gridSpec.alignItems; // Fallback to container items
-  switch (effectiveAlign) {
+  // Vertical Alignment (Grid Align) -> justifyContent
+  let wrapperJustifyContent: ViewStyle['justifyContent'];
+  switch (align) {
     case 'flex-start': wrapperJustifyContent = 'flex-start'; break;
     case 'flex-end': wrapperJustifyContent = 'flex-end'; break;
     case 'center': wrapperJustifyContent = 'center'; break;
-    case 'stretch': wrapperJustifyContent = 'flex-start'; break; // Default to start, children maximize height via flex/height:100% naturally if needed
-    case 'baseline': wrapperJustifyContent = 'flex-start'; break; // Approximate baseline
-    default: wrapperJustifyContent = 'flex-start'; // Default behavior
+    case 'stretch': wrapperJustifyContent = 'flex-start'; break; // Default to start for vertical stretch (content expands via height/flex-grow)
+    case 'baseline': wrapperJustifyContent = 'flex-start'; break;
+    default: wrapperJustifyContent = 'flex-start';
   }
+
+  // ... (Rows logic omitted for brevity, keeping existing) ...
+  // [Rows Logic Block would be here, but using MultiReplace might miss context if I don't include it. 
+  // I will just return the object update since I can't easily include the huge rows block in a reliable replace without context errors.]
+
+  // Actually, I can replace the return statement block safely.
+  // But I need to preserve the `heightStyle` logic.
+  // I will only replace the top block and the return block separately if possible.
+  // Or just replace the top block (calculation) and rely on existing return uses `wrapperAlignItems`.
+
+  // Wait, I need to add `flexDirection: 'column'` to the return. 
+  // So I should replace the return usage too.
+
 
   let heightStyle: ViewStyle | undefined;
 
@@ -251,6 +263,8 @@ export function computeItemStyle(
     paddingVertical: gapY / 2,
 
     // Inner Alignment
+    display: 'flex',
+    flexDirection: 'column',
     alignItems: wrapperAlignItems,
     justifyContent: wrapperJustifyContent,
   };

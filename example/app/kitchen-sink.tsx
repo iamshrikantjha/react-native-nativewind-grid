@@ -143,18 +143,20 @@ export default function KitchenSink() {
 
 
                 {/* 7. Justify Content */}
-                <Section title="7. Justify Content (Main Axis Container)" desc="Controls how grid tracks (columns) are aligned along the main axis. Requires items to NOT fill the row width (e.g. fixed widths).">
+                <Section title="7. Justify Content (Main Axis Container)" desc="Controls how grid tracks (columns) are aligned along the main axis. Requires free space (fixed width items).">
                     <Text className="text-xs text-slate-500 mb-2 font-mono">justify-start | justify-end | justify-center | justify-between | justify-around | justify-evenly</Text>
 
-                    <Text className="font-bold text-sm mb-1">justify-between</Text>
-                    {/* Remove grid-cols-3 so items don't take 33%. Use w-16 to leave space. */}
-                    <Grid className="grid-cols-none flex-row justify-between gap-2 bg-slate-100 p-2 mb-4">
+                    <Text className="font-bold text-sm mb-1">justify-between (6 items, wrapping)</Text>
+                    <Grid className="grid-cols-none flex-row flex-wrap justify-between gap-2 bg-slate-100 p-2 mb-4">
                         <Box text="1" className="w-16 bg-pink-200" />
                         <Box text="2" className="w-16 bg-pink-200" />
                         <Box text="3" className="w-16 bg-pink-200" />
+                        <Box text="4" className="w-16 bg-pink-200" />
+                        <Box text="5" className="w-16 bg-pink-200" />
+                        <Box text="6" className="w-16 bg-pink-200" />
                     </Grid>
 
-                    <Text className="font-bold text-sm mb-1">justify-center</Text>
+                    <Text className="font-bold text-sm mb-1">justify-center (3 items, 1 row)</Text>
                     <Grid className="grid-cols-none flex-row justify-center gap-2 bg-slate-100 p-2">
                         <Box text="1" className="w-16 bg-pink-300" />
                         <Box text="2" className="w-16 bg-pink-300" />
@@ -163,85 +165,194 @@ export default function KitchenSink() {
                 </Section>
 
                 {/* 8. Align Content */}
-                <Section title="8. Align Content (Cross Axis Container)" desc="Controls how rows are aligned correctly if they don't fill the container height.">
+                <Section title="8. Align Content (Cross Axis Container)" desc="Controls how rows are aligned if they don't fill the container height.">
                     <Text className="text-xs text-slate-500 mb-2 font-mono">content-start | content-end | content-center | content-between | content-around | content-evenly</Text>
 
-                    <Text className="font-bold text-sm mb-1">content-center</Text>
-                    <Grid className="grid-cols-3 content-center h-40 gap-2 bg-slate-100 p-2">
+                    <Text className="font-bold text-sm mb-1">content-center (6 items, 2 rows)</Text>
+                    {/* Height 64 (256px) is tall enough to show alignment of 2 rows */}
+                    <Grid className="grid-cols-3 content-center h-64 gap-2 bg-slate-100 p-2">
                         <Box text="1" className="h-8 bg-purple-200" />
                         <Box text="2" className="h-8 bg-purple-200" />
                         <Box text="3" className="h-8 bg-purple-200" />
                         <Box text="4" className="h-8 bg-purple-200" />
                         <Box text="5" className="h-8 bg-purple-200" />
+                        <Box text="6" className="h-8 bg-purple-200" />
                     </Grid>
                 </Section>
 
                 {/* 9. Justify Items */}
-                <Section title="9. Justify Items (Inline Axis Item)" desc="Controls default horizontal alignment of items within their grid cells.">
+                <Section title="9. Justify Items (Inline Axis Item)" desc="Controls default horizontal alignment of items within their grid cells. Applying to all 6 items.">
                     <Text className="text-xs text-slate-500 mb-2 font-mono">justify-items-start | justify-items-end | justify-items-center | justify-items-stretch</Text>
 
                     {/* Start */}
-                    <Text className="font-bold text-sm mb-1 mt-2">justify-items-start (Default)</Text>
-                    <Grid className="grid-cols-2 justify-items-start gap-2 bg-slate-100 p-2 border border-slate-200">
-                        <View className="bg-white border border-slate-300"><Box text="Start" className="w-16 bg-cyan-200" /></View>
-                        <View className="bg-white border border-slate-300"><Box text="Start" className="w-16 bg-cyan-200" /></View>
+                    <Text className="font-bold text-sm mb-1 mt-2">justify-items-start</Text>
+                    <Grid className="grid-cols-3 justify-items-start gap-2 bg-slate-100 p-2 border border-slate-200">
+                        {[1, 2, 3, 4, 5, 6].map(i => (
+                            <View key={i} className="bg-white border border-slate-300">
+                                <Box text="Start" className="w-16 bg-cyan-200" />
+                            </View>
+                        ))}
                     </Grid>
 
                     {/* Center */}
                     <Text className="font-bold text-sm mb-1 mt-2">justify-items-center</Text>
-                    <Grid className="grid-cols-2 justify-items-center gap-2 bg-slate-100 p-2 border border-slate-200">
-                        <View className="bg-white border border-slate-300"><Box text="Center" className="w-16 bg-cyan-300" /></View>
-                        <View className="bg-white border border-slate-300"><Box text="Center" className="w-16 bg-cyan-300" /></View>
+                    <Grid className="grid-cols-3 justify-items-center gap-2 bg-slate-100 p-2 border border-slate-200">
+                        {[1, 2, 3, 4, 5, 6].map(i => (
+                            <View key={i} className="bg-white border border-slate-300">
+                                <Box text="Center" className="w-16 bg-cyan-300" />
+                            </View>
+                        ))}
                     </Grid>
 
                     {/* End */}
                     <Text className="font-bold text-sm mb-1 mt-2">justify-items-end</Text>
-                    <Grid className="grid-cols-2 justify-items-end gap-2 bg-slate-100 p-2 border border-slate-200">
-                        <View className="bg-white border border-slate-300"><Box text="End" className="w-16 bg-cyan-400" /></View>
-                        <View className="bg-white border border-slate-300"><Box text="End" className="w-16 bg-cyan-400" /></View>
+                    <Grid className="grid-cols-3 justify-items-end gap-2 bg-slate-100 p-2 border border-slate-200">
+                        {[1, 2, 3, 4, 5, 6].map(i => (
+                            <View key={i} className="bg-white border border-slate-300">
+                                <Box text="End" className="w-16 bg-cyan-400" />
+                            </View>
+                        ))}
                     </Grid>
 
                     {/* Stretch */}
                     <Text className="font-bold text-sm mb-1 mt-2">justify-items-stretch</Text>
-                    <Grid className="grid-cols-2 justify-items-stretch gap-2 bg-slate-100 p-2 border border-slate-200">
-                        {/* Items must NOT have fixed width to stretch, or use w-auto (default) */}
-                        <View className="bg-white border border-slate-300"><Box text="Stretch (Auto Width)" className="bg-cyan-500 text-white" /></View>
-                        <View className="bg-white border border-slate-300"><Box text="Stretch (Auto Width)" className="bg-cyan-500 text-white" /></View>
+                    <Grid className="grid-cols-3 justify-items-stretch gap-2 bg-slate-100 p-2 border border-slate-200">
+                        {[1, 2, 3, 4, 5, 6].map(i => (
+                            <View key={i} className="bg-white border border-slate-300 w-auto">
+                                <Box text="Stretch" className="bg-cyan-500 text-white" />
+                            </View>
+                        ))}
                     </Grid>
                 </Section>
 
                 {/* 10. Align Items */}
-                <Section title="10. Align Items (Block Axis Item)" desc="Controls default vertical alignment of items within their grid cells.">
+                <Section title="10. Align Items (Block Axis Item)" desc="Controls default vertical alignment of items within their grid cells. Applying to all 6 items.">
                     <Text className="text-xs text-slate-500 mb-2 font-mono">items-start | items-end | items-center | items-baseline | items-stretch</Text>
 
                     <Text className="font-bold text-sm mb-1">items-center</Text>
-                    <Grid className="grid-cols-3 items-center h-24 bg-gray-100 gap-2 p-2">
-                        <View className="bg-white border border-gray-200"><Box text="C" className="h-10 bg-teal-200" /></View>
-                        <View className="bg-white border border-gray-200"><Box text="C" className="h-10 bg-teal-200" /></View>
-                        <View className="bg-white border border-gray-200"><Box text="C" className="h-10 bg-teal-200" /></View>
+                    <Grid className="grid-cols-3 items-center h-48 bg-gray-100 gap-2 p-2">
+                        {[1, 2, 3, 4, 5, 6].map(i => (
+                            <View key={i} className="bg-white border border-gray-200">
+                                <Box text="Center" className="h-10 bg-teal-200" />
+                            </View>
+                        ))}
                     </Grid>
                 </Section>
 
                 {/* 11. Justify Self */}
-                <Section title="11. Justify Self (Override Inline)" desc="Overrides inline alignment for a single item.">
+                <Section title="11. Justify Self (Override Inline)" desc="Overrides inline (horizontal) alignment for a single item. One item differs from the rest.">
                     <Text className="text-xs text-slate-500 mb-2 font-mono">justify-self-auto | justify-self-start | justify-self-end | justify-self-center | justify-self-stretch</Text>
 
-                    <Grid className="grid-cols-2 gap-2 bg-indigo-50 p-2">
-                        <Box text="Default (Stretch)" className="bg-indigo-200" />
-                        <View className="bg-white border border-indigo-100">
-                            <Box text="justify-self-end" className="justify-self-end w-24 bg-indigo-300" />
+                    {/* justify-self-start */}
+                    <Text className="font-bold text-sm mb-1 mt-2">justify-self-start (vs properties)</Text>
+                    <Grid className="grid-cols-3 gap-2 bg-slate-50 p-2 border border-slate-200 mb-4">
+                        <Box text="1" className="bg-slate-200" />
+                        <View className="justify-self-start bg-white border border-indigo-300 col-span-1">
+                            <Box text="Start" className="w-16 bg-indigo-500 text-white" />
                         </View>
+                        <Box text="3" className="bg-slate-200" />
+                        <Box text="4" className="bg-slate-200" />
+                        <Box text="5" className="bg-slate-200" />
+                        <Box text="6" className="bg-slate-200" />
+                    </Grid>
+
+                    {/* justify-self-center */}
+                    <Text className="font-bold text-sm mb-1 mt-2">justify-self-center</Text>
+                    <Grid className="grid-cols-3 gap-2 bg-slate-50 p-2 border border-slate-200 mb-4">
+                        <Box text="1" className="bg-slate-200" />
+                        <View className="justify-self-center bg-white border border-indigo-300 col-span-1">
+                            <Box text="Center" className="w-16 bg-indigo-500 text-white" />
+                        </View>
+                        <Box text="3" className="bg-slate-200" />
+                        <Box text="4" className="bg-slate-200" />
+                        <Box text="5" className="bg-slate-200" />
+                        <Box text="6" className="bg-slate-200" />
+                    </Grid>
+
+                    {/* justify-self-end */}
+                    <Text className="font-bold text-sm mb-1 mt-2">justify-self-end</Text>
+                    <Grid className="grid-cols-3 gap-2 bg-slate-50 p-2 border border-slate-200 mb-4">
+                        <Box text="1" className="bg-slate-200" />
+                        <View className="justify-self-end bg-white border border-indigo-300 col-span-1">
+                            <Box text="End" className="w-16 bg-indigo-500 text-white" />
+                        </View>
+                        <Box text="3" className="bg-slate-200" />
+                        <Box text="4" className="bg-slate-200" />
+                        <Box text="5" className="bg-slate-200" />
+                        <Box text="6" className="bg-slate-200" />
+                    </Grid>
+
+                    {/* justify-self-stretch */}
+                    <Text className="font-bold text-sm mb-1 mt-2">justify-self-stretch (Override Start)</Text>
+                    <Text className="text-xs text-slate-400 mb-1">Container is `justify-items-start`. Target item is `stretch`.</Text>
+                    <Grid className="grid-cols-3 justify-items-start gap-2 bg-slate-50 p-2 border border-slate-200">
+                        <Box text="Start" className="w-12 bg-slate-200" />
+                        {/* Target overrides start with stretch */}
+                        <View className="justify-self-stretch bg-white border border-indigo-300 col-span-1">
+                            <Box text="Stretch" className="bg-indigo-500 text-white" />
+                        </View>
+                        <Box text="Start" className="w-12 bg-slate-200" />
+                        <Box text="Start" className="w-12 bg-slate-200" />
+                        <Box text="Start" className="w-12 bg-slate-200" />
+                        <Box text="Start" className="w-12 bg-slate-200" />
                     </Grid>
                 </Section>
 
                 {/* 12. Align Self */}
-                <Section title="12. Align Self (Override Block)" desc="Overrides vertical alignment for a single item.">
+                <Section title="12. Align Self (Override Block)" desc="Overrides vertical alignment for a single item. One item differs from the rest.">
                     <Text className="text-xs text-slate-500 mb-2 font-mono">self-auto | self-start | self-end | self-center | self-stretch | self-baseline</Text>
 
-                    <Grid className="grid-cols-3 h-24 gap-2 bg-indigo-50 p-2">
-                        <Box text="Stretch (Def)" className="bg-indigo-200" />
-                        <Box text="self-center" className="self-center h-10 bg-indigo-300" />
-                        <Box text="self-end" className="self-end h-10 bg-indigo-400" />
+                    {/* self-start */}
+                    <Text className="font-bold text-sm mb-1 mt-2">self-start</Text>
+                    <Grid className="grid-cols-3 h-48 gap-2 bg-slate-50 p-2 border border-slate-200 mb-4">
+                        <Box text="1" className="h-full bg-slate-200" />
+                        <View className="self-start bg-white border border-pink-300 col-span-1">
+                            <Box text="Start" className="h-10 w-full bg-pink-500 text-white" />
+                        </View>
+                        <Box text="3" className="h-full bg-slate-200" />
+                        <Box text="4" className="h-full bg-slate-200" />
+                        <Box text="5" className="h-full bg-slate-200" />
+                        <Box text="6" className="h-full bg-slate-200" />
+                    </Grid>
+
+                    {/* self-center */}
+                    <Text className="font-bold text-sm mb-1 mt-2">self-center</Text>
+                    <Grid className="grid-cols-3 h-48 gap-2 bg-slate-50 p-2 border border-slate-200 mb-4">
+                        <Box text="1" className="h-full bg-slate-200" />
+                        <View className="self-center bg-white border border-pink-300 col-span-1">
+                            <Box text="Center" className="h-10 w-full bg-pink-500 text-white" />
+                        </View>
+                        <Box text="3" className="h-full bg-slate-200" />
+                        <Box text="4" className="h-full bg-slate-200" />
+                        <Box text="5" className="h-full bg-slate-200" />
+                        <Box text="6" className="h-full bg-slate-200" />
+                    </Grid>
+
+                    {/* self-end */}
+                    <Text className="font-bold text-sm mb-1 mt-2">self-end</Text>
+                    <Grid className="grid-cols-3 h-48 gap-2 bg-slate-50 p-2 border border-slate-200 mb-4">
+                        <Box text="1" className="h-full bg-slate-200" />
+                        <View className="self-end bg-white border border-pink-300 col-span-1">
+                            <Box text="End" className="h-10 w-full bg-pink-500 text-white" />
+                        </View>
+                        <Box text="3" className="h-full bg-slate-200" />
+                        <Box text="4" className="h-full bg-slate-200" />
+                        <Box text="5" className="h-full bg-slate-200" />
+                        <Box text="6" className="h-full bg-slate-200" />
+                    </Grid>
+
+                    {/* self-stretch */}
+                    <Text className="font-bold text-sm mb-1 mt-2">self-stretch (Override Start)</Text>
+                    <Text className="text-xs text-slate-400 mb-1">Container is `items-start`. Target item is `stretch`.</Text>
+                    <Grid className="grid-cols-3 items-start h-48 gap-2 bg-slate-50 p-2 border border-slate-200">
+                        <Box text="Start" className="h-10 bg-slate-200" />
+                        <View className="self-stretch bg-white border border-pink-300 col-span-1">
+                            <Box text="Stretch" className="bg-pink-500 text-white" />
+                        </View>
+                        <Box text="Start" className="h-10 bg-slate-200" />
+                        <Box text="Start" className="h-10 bg-slate-200" />
+                        <Box text="Start" className="h-10 bg-slate-200" />
+                        <Box text="Start" className="h-10 bg-slate-200" />
                     </Grid>
                 </Section>
 
