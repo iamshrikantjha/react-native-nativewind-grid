@@ -5,8 +5,10 @@ export type TrackSizing =
   | { type: 'auto' };
 
 export interface GridSpec {
-  cols: number | TrackSizing[] | 'subgrid';
-  rows?: number | TrackSizing[]; // Future proofing
+  cols: number | TrackSizing[] | 'subgrid' | undefined;
+  rows?: number | TrackSizing[]; // Supported arbitrary rows
+  autoCols?: TrackSizing[] | TrackSizing;
+  autoRows?: TrackSizing[] | TrackSizing;
   gap: number;
   gapX?: number;
   gapY?: number;
@@ -40,6 +42,8 @@ const parseTrackString = (str: string): TrackSizing[] => {
 
   return parts.map(part => {
     if (part === 'auto') return { type: 'auto' };
+    if (part === 'min') return { type: 'auto' }; // min-content roughly auto for this
+    if (part === 'max') return { type: 'auto' }; // max-content roughly auto for this
     if (part.endsWith('fr')) return { type: 'fraction', value: parseFloat(part) };
     if (part.endsWith('%')) return { type: 'percent', value: parseFloat(part) };
     if (part.endsWith('px')) return { type: 'fixed', value: parseFloat(part) };
@@ -112,6 +116,20 @@ const parseArbitraryTracks = (cls: string, prefix: string): TrackSizing[] | unde
   return undefined;
 };
 
+const parseAutoTracks = (val: string): TrackSizing | undefined => {
+  if (val === 'auto') return { type: 'auto' };
+  if (val === 'min') return { type: 'auto' };
+  if (val === 'max') return { type: 'auto' };
+  if (val === 'fr') return { type: 'fraction', value: 1 };
+  if (val.endsWith('fr')) return { type: 'fraction', value: parseFloat(val) };
+  if (val.endsWith('%')) return { type: 'percent', value: parseFloat(val) };
+  if (val.endsWith('px')) return { type: 'fixed', value: parseFloat(val) };
+  // Check arbitrary: auto-cols-[100px] -> val is [100px] in some parsers, but here val is passed clean?
+  // Let's assume val is the resolved part.
+  const num = parseFloat(val);
+  return isNaN(num) ? undefined : { type: 'fixed', value: num };
+};
+
 const parseValue = (cls: string, prefix: string): number | undefined => {
   // Check arbitrary first: prefix-[123]
   const arb = parseArbitrary(cls, prefix);
@@ -178,7 +196,7 @@ const mapAlignSelf = (val: string) => {
 
 export function parseGridClasses(className?: string): GridSpec {
   const spec: GridSpec = {
-    cols: 1,
+    cols: undefined, // Default to undefined to distinguish from explicit grid-cols-1
     rows: undefined,
     gap: 0,
     autoFlow: 'row',
@@ -205,8 +223,40 @@ export function parseGridClasses(className?: string): GridSpec {
     }
 
     // grid-rows
-    const rows = parseValue(cls, 'grid-rows-');
-    if (rows !== undefined) spec.rows = rows;
+    const complexRows = parseArbitraryTracks(cls, 'grid-rows-');
+    if (complexRows) {
+      spec.rows = complexRows;
+    } else {
+      const rows = parseValue(cls, 'grid-rows-');
+      if (rows !== undefined) spec.rows = rows;
+    }
+
+    // auto-cols
+    if (cls.startsWith('auto-cols-')) {
+      // Check arbitrary: auto-cols-[100px]
+      if (cls.includes('[')) {
+        const val = cls.slice(cls.indexOf('[') + 1, -1);
+        const track = parseAutoTracks(val);
+        if (track) spec.autoCols = track;
+      } else {
+        const val = cls.replace('auto-cols-', '');
+        const track = parseAutoTracks(val);
+        if (track) spec.autoCols = track;
+      }
+    }
+
+    // auto-rows
+    if (cls.startsWith('auto-rows-')) {
+      if (cls.includes('[')) {
+        const val = cls.slice(cls.indexOf('[') + 1, -1);
+        const track = parseAutoTracks(val);
+        if (track) spec.autoRows = track;
+      } else {
+        const val = cls.replace('auto-rows-', '');
+        const track = parseAutoTracks(val);
+        if (track) spec.autoRows = track;
+      }
+    }
 
     // gap
     // Note: Arbitrary values like gap-[20px] will be parsed as 20.

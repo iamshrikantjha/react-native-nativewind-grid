@@ -26,7 +26,8 @@ export function computeContainerStyle(spec: GridSpec): ViewStyle {
     // Actually, 'align-items' in Grid affects Direct Children.
     // Since our Direct Children are Wrappers, this aligns the Wrappers in the row.
     // 'stretch' is default. 'center' would center the wrapper vertically in the row.
-    alignContent: spec.alignContent,     // e.g. 'center', 'space-around'
+    // 'stretch' is default. 'center' would center the wrapper vertically in the row.
+    alignContent: spec.alignContent || 'stretch',     // Default to stretch to mimic Grid Track behavior (filling container)
 
     // CRITICAL FIX: Decouple item alignment from container alignment.
     // In Grid, align-items aligns items *inside* their area.
@@ -45,7 +46,7 @@ export function computeContainerStyle(spec: GridSpec): ViewStyle {
 export function computeItemStyle(
   gridSpec: GridSpec,
   itemSpec: ItemSpec,
-  resolvedPlacement?: { colStart: number; colSpan: number }
+  resolvedPlacement?: { colStart: number; colSpan: number; rowStart: number; rowSpan: number }
 ): ViewStyle {
   const gap = gridSpec.gap ?? 0;
   const gapX = gridSpec.gapX ?? gap;
@@ -64,7 +65,7 @@ export function computeItemStyle(
   // Width Calculation
   let widthStyle: ViewStyle | undefined;
 
-  // Complex Tracks Logic
+  // Complex Tracks Logic (Columns/Width)
   if (Array.isArray(cols)) {
     if (resolvedPlacement) {
       // calculate width based on specific tracks
@@ -78,8 +79,27 @@ export function computeItemStyle(
       let percentTotal = 0;
 
       for (let i = startIdx; i < endIdx; i++) {
-        if (i >= cols.length) break;
-        const track = cols[i];
+        // Determine track definition
+        let track: any = null;
+        if (i < cols.length) {
+          track = cols[i];
+        } else {
+          // Implicit column -> use autoCols
+          // autoCols can be single or array (cyclic)? Spec says TrackSizing[] | TrackSizing.
+          // Parser mostly produces single TrackSizing.
+          if (gridSpec.autoCols) {
+            if (Array.isArray(gridSpec.autoCols)) {
+              // Cycle if array? Or just 0? CSS Grid usually repeats the pattern.
+              // For now assume single or simplistic.
+              track = gridSpec.autoCols[(i - cols.length) % gridSpec.autoCols.length];
+            } else {
+              track = gridSpec.autoCols;
+            }
+          } else {
+            track = { type: 'auto' }; // Default implicit
+          }
+        }
+
         if (!track) continue; // Safety check
 
         if (track.type === 'fraction') {
@@ -110,9 +130,12 @@ export function computeItemStyle(
     }
   }
   // Simple Number Logic
-  else if (typeof cols === 'number' && cols > 0) {
-    const widthPercentage = (100 / cols) * colSpan;
-    widthStyle = { width: `${widthPercentage}%` as DimensionValue };
+  else if (typeof cols === 'number' || cols === undefined) {
+    const colCount = typeof cols === 'number' ? cols : 1;
+    if (colCount > 0) {
+      const widthPercentage = (100 / colCount) * colSpan;
+      widthStyle = { width: `${widthPercentage}%` as DimensionValue };
+    }
   }
 
 
@@ -156,20 +179,68 @@ export function computeItemStyle(
   }
 
   let heightStyle: ViewStyle | undefined;
-  // Backward Compatibility: Only calculate height if explicit rows are defined.
-  // Otherwise, default to content-based height (flex behavior).
 
-  // Checking rows type safely
+  // ROWS LOGIC
   const rows = gridSpec.rows;
-  if (typeof rows === 'number' && rows > 0) {
+
+  // 1. Array-based Rows (Arbitrary)
+  if (Array.isArray(rows)) {
+    if (resolvedPlacement) {
+      const startIdx = resolvedPlacement.rowStart - 1;
+      const endIdx = startIdx + (itemSpec.rowSpan || 1);
+
+      let flexGrow = 0;
+      let pixelHeight = 0;
+      let isPercent = false;
+      let percentTotal = 0;
+
+      for (let i = startIdx; i < endIdx; i++) {
+        let track: any = null;
+        if (i < rows.length) {
+          track = rows[i];
+        } else {
+          // Implicit row -> autoRows
+          if (gridSpec.autoRows) {
+            if (Array.isArray(gridSpec.autoRows)) {
+              track = gridSpec.autoRows[(i - rows.length) % gridSpec.autoRows.length];
+            } else {
+              track = gridSpec.autoRows;
+            }
+          } else {
+            track = { type: 'auto' };
+          }
+        }
+
+        if (!track) continue;
+
+        if (track.type === 'fraction') {
+          flexGrow += track.value;
+        } else if (track.type === 'fixed') {
+          pixelHeight += track.value;
+        } else if (track.type === 'percent') {
+          isPercent = true;
+          percentTotal += track.value;
+        }
+      }
+
+      if (flexGrow > 0) {
+        heightStyle = { flexGrow, flexBasis: pixelHeight > 0 ? pixelHeight : 0 };
+      } else if (isPercent) {
+        heightStyle = { height: `${percentTotal}%` as DimensionValue };
+      } else if (pixelHeight > 0) {
+        heightStyle = { height: pixelHeight };
+      }
+    }
+  }
+  // 2. Number-based Rows (Explicit)
+  else if (typeof rows === 'number' && rows > 0) {
     const rowSpan = itemSpec.rowSpan || 1;
     // Calculate percentage height based on total explicit rows
     const heightPercentage = (100 / rows) * rowSpan;
+    // We must ensure the container has height for this to work, 
+    // usually handled by flex: 1 on container or fixed height.
     heightStyle = { height: `${heightPercentage}%` as DimensionValue };
   }
-
-  // Inner Alignment
-  // ... (rest of logic)
 
   return {
     ...widthStyle,

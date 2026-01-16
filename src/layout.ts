@@ -41,7 +41,7 @@ export function computeGridLayout(
 
     const totalCols = (Array.isArray(gridSpec.cols))
         ? gridSpec.cols.length
-        : (typeof gridSpec.cols === 'number' ? gridSpec.cols : 1);
+        : (typeof gridSpec.cols === 'number' ? gridSpec.cols : (gridSpec.autoFlow?.includes('column') ? 1000 : 1));
     const autoFlow = gridSpec.autoFlow || 'row';
     const isDense = autoFlow.includes('dense');
 
@@ -202,58 +202,115 @@ export function computeGridLayout(
         }
         // CASE 2: Auto Placement
         else {
+            const isColumnFlow = autoFlow.includes('column');
+
             if (isDense) {
-                // Dense: Reset cursors to start to fill gaps
-                // But actually, for 'dense', we scan from start of grid 
-                // every time? Or maintain a separate cursor?
-                // Standard dense auto-flow scans from 0,0 items.
-                let r = 0;
-                let c = 0;
-                let placed = false;
-                while (!placed) {
-                    if (c + colSpan <= totalCols) {
-                        if (!isOccupied(r, c, rowSpan, colSpan)) {
-                            targetRow = r;
-                            targetCol = c;
-                            placed = true;
+                // Dense Packing
+                if (!isColumnFlow) {
+                    // Row-Major Scan (Original)
+                    let placed = false;
+                    // Scan Rows then Cols
+                    // Note: We scan potentially infinite rows if sparse, but for dense we usually fill holes.
+                    // If strict rows defined, we limit. If not, proceed until placed.
+                    let r = 0;
+                    let c = 0;
+                    while (!placed) {
+                        if (c + colSpan <= totalCols) {
+                            if (!isOccupied(r, c, rowSpan, colSpan)) {
+                                targetRow = r;
+                                targetCol = c;
+                                placed = true;
+                            }
                         }
+                        c++;
+                        if (c >= totalCols) {
+                            c = 0;
+                            r++;
+                        }
+                        if (r > 1000) break; // safety
                     }
-                    c++;
-                    if (c >= totalCols) {
-                        c = 0;
+                } else {
+                    // Column-Major Scan (New)
+                    // San Columns then Rows
+                    let placed = false;
+                    let c = 0;
+                    let r = 0; // Scan r=0..totalRows
+                    while (!placed) {
+                        // Check logic: 
+                        // Check if we fit in current slot (c, r)
+                        // Ensure rowSpan fits in totalRows (if strictly defined?)
+                        // If totalRows is explicit (grid-rows-3), item cannot exceed it?
+                        // Actually CSS Grid: if item is taller than explicit rows, it creates implicit rows?
+                        // But for column flow wrapping, we wrap when we hit explicit boundary.
+
+                        const rowsLimit = (typeof gridSpec.rows === 'number')
+                            ? gridSpec.rows
+                            : (Array.isArray(gridSpec.rows) ? gridSpec.rows.length : 10000);
+
+                        // Check if item fits vertically
+                        if (r + rowSpan <= rowsLimit) {
+                            if (!isOccupied(r, c, rowSpan, colSpan)) {
+                                targetRow = r;
+                                targetCol = c;
+                                placed = true;
+                            }
+                        }
+
+                        // Advance
                         r++;
+                        if (r >= rowsLimit) { // Or effectively "end of track"
+                            r = 0;
+                            c++;
+                        }
+
+                        if (c > 1000) break; // safety
                     }
-                    if (r > 1000) break; // safety
                 }
             } else {
-                // Spare (Standard): Use cursor
-                // Check if item fits at current cursor
-                while (true) {
-                    // Wrap if needed
-                    if (autoCol + colSpan > totalCols) {
-                        autoCol = 0;
+                // Sparce (Standard) Packing
+                if (!isColumnFlow) {
+                    // Row-Major Cursor
+                    while (true) {
+                        if (autoCol + colSpan > totalCols) {
+                            autoCol = 0;
+                            autoRow++;
+                        }
+                        if (!isOccupied(autoRow, autoCol, rowSpan, colSpan)) {
+                            targetRow = autoRow;
+                            targetCol = autoCol;
+                            // Update Cursor: Move past item
+                            // Spec says: cursor follows item.
+                            // In standard, next item starts after this one.
+                            autoCol += colSpan;
+                            break;
+                        }
+                        autoCol++;
+                    }
+                } else {
+                    // Column-Major Cursor
+                    const rowsLimit = (typeof gridSpec.rows === 'number')
+                        ? gridSpec.rows
+                        : (Array.isArray(gridSpec.rows) ? gridSpec.rows.length : 10000);
+
+                    while (true) {
+                        // Wrap if we hit row limit
+                        // Wait, if item doesn't fit vertically, we wrap.
+                        if (autoRow + rowSpan > rowsLimit) {
+                            autoRow = 0;
+                            autoCol++;
+                        }
+
+                        if (!isOccupied(autoRow, autoCol, rowSpan, colSpan)) {
+                            targetRow = autoRow;
+                            targetCol = autoCol;
+                            // Update Cursor
+                            // Advance vertically
+                            autoRow += rowSpan;
+                            break;
+                        }
                         autoRow++;
                     }
-
-                    if (!isOccupied(autoRow, autoCol, rowSpan, colSpan)) {
-                        targetRow = autoRow;
-                        targetCol = autoCol;
-                        // Update cursor for next item
-                        // Move cursor past this item
-                        // autoCol += colSpan; // No, next item might start at next slot?
-                        // Actually, CSS grid moves cursor??
-                        // "The auto-placement cursor is advanced..."
-                        // Usually it moves to the end of the placed item.
-                        // autoCol = targetCol + colSpan;
-                        break;
-                    }
-
-                    // If occupied, advance cursor
-                    autoCol++;
                 }
-
-                // Advance cursor for next time (Sparse mode doesn't backtrack)
-                autoCol = targetCol + colSpan;
             }
         }
 
