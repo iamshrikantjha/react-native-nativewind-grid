@@ -180,16 +180,33 @@ export default function KitchenSink() {
                 <Section title="9. Justify Items (Inline Axis Item)" desc="Controls default horizontal alignment of items within their grid cells.">
                     <Text className="text-xs text-slate-500 mb-2 font-mono">justify-items-start | justify-items-end | justify-items-center | justify-items-stretch</Text>
 
-                    <Text className="font-bold text-sm mb-1">justify-items-center</Text>
-                    <Grid className="grid-cols-2 justify-items-center gap-2 bg-slate-50 p-2 mb-4">
-                        <View className="w-full bg-white border border-slate-200"><Box text="Center" className="w-16 bg-cyan-200" /></View>
-                        <View className="w-full bg-white border border-slate-200"><Box text="Center" className="w-16 bg-cyan-200" /></View>
+                    {/* Start */}
+                    <Text className="font-bold text-sm mb-1 mt-2">justify-items-start (Default)</Text>
+                    <Grid className="grid-cols-2 justify-items-start gap-2 bg-slate-100 p-2 border border-slate-200">
+                        <View className="bg-white border border-slate-300"><Box text="Start" className="w-16 bg-cyan-200" /></View>
+                        <View className="bg-white border border-slate-300"><Box text="Start" className="w-16 bg-cyan-200" /></View>
                     </Grid>
 
-                    <Text className="font-bold text-sm mb-1">justify-items-end</Text>
-                    <Grid className="grid-cols-2 justify-items-end gap-2 bg-slate-50 p-2">
-                        <View className="w-full bg-white border border-slate-200"><Box text="End" className="w-16 bg-cyan-300" /></View>
-                        <View className="w-full bg-white border border-slate-200"><Box text="End" className="w-16 bg-cyan-300" /></View>
+                    {/* Center */}
+                    <Text className="font-bold text-sm mb-1 mt-2">justify-items-center</Text>
+                    <Grid className="grid-cols-2 justify-items-center gap-2 bg-slate-100 p-2 border border-slate-200">
+                        <View className="bg-white border border-slate-300"><Box text="Center" className="w-16 bg-cyan-300" /></View>
+                        <View className="bg-white border border-slate-300"><Box text="Center" className="w-16 bg-cyan-300" /></View>
+                    </Grid>
+
+                    {/* End */}
+                    <Text className="font-bold text-sm mb-1 mt-2">justify-items-end</Text>
+                    <Grid className="grid-cols-2 justify-items-end gap-2 bg-slate-100 p-2 border border-slate-200">
+                        <View className="bg-white border border-slate-300"><Box text="End" className="w-16 bg-cyan-400" /></View>
+                        <View className="bg-white border border-slate-300"><Box text="End" className="w-16 bg-cyan-400" /></View>
+                    </Grid>
+
+                    {/* Stretch */}
+                    <Text className="font-bold text-sm mb-1 mt-2">justify-items-stretch</Text>
+                    <Grid className="grid-cols-2 justify-items-stretch gap-2 bg-slate-100 p-2 border border-slate-200">
+                        {/* Items must NOT have fixed width to stretch, or use w-auto (default) */}
+                        <View className="bg-white border border-slate-300"><Box text="Stretch (Auto Width)" className="bg-cyan-500 text-white" /></View>
+                        <View className="bg-white border border-slate-300"><Box text="Stretch (Auto Width)" className="bg-cyan-500 text-white" /></View>
                     </Grid>
                 </Section>
 
@@ -199,9 +216,9 @@ export default function KitchenSink() {
 
                     <Text className="font-bold text-sm mb-1">items-center</Text>
                     <Grid className="grid-cols-3 items-center h-24 bg-gray-100 gap-2 p-2">
-                        <View className="h-full bg-white border border-gray-200"><Box text="C" className="h-10 bg-teal-200" /></View>
-                        <View className="h-full bg-white border border-gray-200"><Box text="C" className="h-10 bg-teal-200" /></View>
-                        <View className="h-full bg-white border border-gray-200"><Box text="C" className="h-10 bg-teal-200" /></View>
+                        <View className="bg-white border border-gray-200"><Box text="C" className="h-10 bg-teal-200" /></View>
+                        <View className="bg-white border border-gray-200"><Box text="C" className="h-10 bg-teal-200" /></View>
+                        <View className="bg-white border border-gray-200"><Box text="C" className="h-10 bg-teal-200" /></View>
                     </Grid>
                 </Section>
 
