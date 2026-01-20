@@ -1,5 +1,5 @@
 import { computeGridLayout, type GridItem } from '../layout';
-import type { GridSpec, ItemSpec } from '../parser';
+import { parseGridClasses, type GridSpec, type ItemSpec } from '../parser';
 
 // Helper to create mock items
 const createItem = (id: string, spec: Partial<ItemSpec> = {}, order = 0): GridItem => ({
@@ -7,6 +7,16 @@ const createItem = (id: string, spec: Partial<ItemSpec> = {}, order = 0): GridIt
     order,
     spec: { colSpan: 1, rowSpan: 1, ...spec },
     originalIndex: 0
+});
+
+describe('Grid Parser', () => {
+    test('Parses grid-flow-row-dense', () => {
+        const cls = "grid grid-flow-row-dense grid-cols-3 grid-rows-3 gap-2";
+        const spec = parseGridClasses(cls);
+        expect(spec.autoFlow).toBe('row dense');
+        expect(spec.cols).toBe(3);
+        expect(spec.rows).toBe(3);
+    });
 });
 
 describe('Strict Grid Layout Algorithm', () => {
@@ -143,6 +153,35 @@ describe('Strict Grid Layout Algorithm', () => {
 
         expect(result.placedItems[2]!.id).toBe('3');
         expect(result.placedItems[2]).toMatchObject({ rowStart: 1, colStart: 3 });
+    });
+
+    test('Dense Packing Reproduction: Fills holes correctly', () => {
+        const items = [
+            createItem('1', { colSpan: 2 }),
+            createItem('2', { colSpan: 2 }),
+            createItem('3'),
+            createItem('4'),
+            createItem('5'),
+        ];
+
+        const spec: GridSpec = {
+            cols: 3,
+            gap: 0,
+            autoFlow: 'row dense'
+        };
+
+        const result = computeGridLayout(items, spec);
+        const { placedItems } = result;
+
+        const p3 = placedItems.find(p => p.id === '3');
+        // If broken, p3 will be at 2,3 (sparse behavior) or worse
+        expect(p3).toMatchObject({ rowStart: 1, colStart: 3 });
+
+        const p4 = placedItems.find(p => p.id === '4');
+        expect(p4).toMatchObject({ rowStart: 2, colStart: 3 });
+
+        const p5 = placedItems.find(p => p.id === '5');
+        expect(p5).toMatchObject({ rowStart: 3, colStart: 1 });
     });
 
 });

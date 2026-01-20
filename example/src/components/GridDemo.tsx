@@ -101,8 +101,12 @@ export function GridDemo() {
         <Text style={styles.sectionDesc}>
           Mixed content types, rounded corners, complex spans.
         </Text>
+        <Text className="text-xs text-slate-500 mb-2 font-mono mx-2">
+          grid-cols-4 | col-span-2 | row-span-2 | gap-4
+        </Text>
 
         <Grid className="grid grid-cols-4 gap-4 mb-12">
+          {/* ... existing content ... */}
           {/* Profile Large */}
           <View className="col-span-2 row-span-2 bg-white rounded-3xl p-5 shadow-sm justify-between">
             <View className="flex-row items-center gap-3">
@@ -121,7 +125,7 @@ export function GridDemo() {
           </View>
 
           {/* Social Link (Dark Mode) */}
-          <View className="col-span-2 row-span-2 flex-1 bg-slate-900 rounded-3xl p-5 flex-row justify-between shadow-sm">
+          <View className="col-span-2 row-span-2 bg-slate-900 rounded-3xl p-5 flex-row justify-between shadow-sm">
             <Text className="text-white font-bold text-lg">GitHub</Text>
             <View className="w-8 h-8 rounded-full bg-white/20 items-center justify-center transform -rotate-45">
               <Text className="text-white">➜</Text>
@@ -155,8 +159,12 @@ export function GridDemo() {
         <Text style={styles.sectionDesc}>
           Using <Text className="font-mono text-purple-600 bg-purple-100 px-1 rounded">place-items-center</Text> shorthands.
         </Text>
+        <Text className="text-xs text-slate-500 mb-2 font-mono mx-2">
+          place-items-center | place-content-between | place-self-end
+        </Text>
 
         <Grid className="grid grid-cols-2 gap-4 h-48 mb-12">
+          {/* ... existing content ... */}
           {/* Box 1: place-items-center (Centers both X and Y) */}
           <View className="bg-white rounded-lg place-items-center shadow-sm border border-slate-100">
             <View className="w-8 h-8 bg-purple-500 rounded-full shadow-lg" />
@@ -178,7 +186,10 @@ export function GridDemo() {
         {/* 3. ARBITRARY VALUES & ORDER */}
         <Text style={styles.sectionTitle}>3. Arbitrary & Order</Text>
         <Text style={styles.sectionDesc}>
-          <Text className="font-mono">grid-cols-[16]</Text>, <Text className="font-mono">gap-[2px]</Text>, <Text className="font-mono">order-last</Text>
+          Custom pixel values and visual reordering.
+        </Text>
+        <Text className="text-xs text-slate-500 mb-2 font-mono mx-2">
+          grid-cols-[16] | gap-[2px] | order-first | order-last
         </Text>
 
         <Grid className="grid grid-cols-[16] gap-[2px] bg-slate-200 p-[2px] rounded-lg mb-12 overflow-hidden">
@@ -197,7 +208,9 @@ export function GridDemo() {
 
         {/* 4. ANALYTICS DASHBOARD (Complex) */}
         <Text style={styles.sectionTitle}>4. SaaS Dashboard</Text>
-
+        <Text className="text-xs text-slate-500 mb-2 font-mono mx-2">
+          col-span-3 | col-span-1 | flex-row | items-baseline
+        </Text>
         <Grid className="grid grid-cols-3 gap-3">
           {/* MRR Card */}
           <View className="col-span-3 bg-slate-900 rounded-lg p-5">
@@ -438,8 +451,267 @@ export function GridDemo() {
         <View style={{ height: 100 }} />
 
         <View style={{ height: 100 }} />
+
+
+
+
+
+
+
+        {/* 13. Dense Packing */}
+        <Text style={styles.sectionTitle}>13. Dense Packing</Text>
+        <Text style={styles.sectionDesc}>
+          <Text className="font-mono">grid-flow-row-dense</Text> backtracks to fill holes.
+        </Text>
+
+        <Grid debug className="grid grid-flow-row-dense grid-cols-3 gap-2">
+          <View className="col-span-2 bg-red-200 h-10 items-center justify-center">
+            <Text>01</Text>
+          </View>
+          <View className="col-span-2 bg-red-200 h-10 items-center justify-center">
+            <Text>02</Text>
+          </View>
+          <View className="col-span-2 bg-red-200 h-10 items-center justify-center">
+            <Text>03</Text>
+          </View>
+          <View className="bg-red-200 h-10 items-center justify-center">
+            <Text>04</Text>
+          </View>
+          <View className="bg-red-200 h-10 items-center justify-center">
+            <Text>05</Text>
+          </View>
+        </Grid>
+
+
+
+        {/* 14. Grid Column */}
+        <Text style={styles.sectionTitle}>14. Grid Column</Text>
+        <Text style={styles.sectionDesc}>
+          <Text className="font-mono">grid-cols-</Text> backtracks to fill holes.
+        </Text>
+        <Grid className="grid grid-cols-3 gap-2">
+          <View className="bg-red-200 h-10 items-center justify-center">
+            <Text>01</Text>
+          </View>
+          <View className="bg-red-200 h-10 items-center justify-center">
+            <Text>02</Text>
+          </View>
+          <View className="bg-red-200 h-10 items-center justify-center">
+            <Text>03</Text>
+          </View>
+          <View className="col-span-2 bg-red-200 h-10 items-center justify-center">
+            <Text>04</Text>
+          </View>
+          <View className="bg-red-200 h-10 items-center justify-center">
+            <Text>05</Text>
+          </View>
+          <View className="bg-red-200 h-10 items-center justify-center">
+            <Text>06</Text>
+          </View>
+          <View className="col-span-2 bg-red-200 h-10 items-center justify-center">
+            <Text>07</Text>
+          </View>
+        </Grid>
+
+
+
+        {/* 15. Grid Row */}
+        <Text style={styles.sectionTitle}>15. Grid Row</Text>
+        <Text style={styles.sectionDesc}>
+          <Text className="font-mono">grid-rows-</Text>
+
+        </Text>
+
+        <Grid className="grid grid-flow-col grid-rows-3 gap-4">
+          <View className="col-span-2 row-span-3 bg-red-200 items-center justify-center">
+            <Text>01</Text>
+          </View>
+          <View className="col-span-1 bg-red-200 items-center justify-center">
+            <Text>02</Text>
+          </View>
+          <View className="col-span-2 row-span-2 bg-red-200 items-center justify-center">
+            <Text>03</Text>
+          </View>
+        </Grid>
+
+
+
+        {/* 16. Grid Row */}
+        <Text style={styles.sectionTitle}>16. Grid Row</Text>
+        <Text style={styles.sectionDesc}>
+          <Text className="font-mono">grid-rows-</Text> & Starting and ending lines
+
+        </Text>
+
+        <Grid className="grid grid-rows-3 grid-flow-col gap-4">
+          <View className="row-start-2 row-span-2 bg-red-200 items-center justify-center">
+            <Text>01</Text>
+          </View>
+          <View className="row-end-3 row-span-2 bg-red-200 items-center justify-center">
+            <Text>02</Text>
+          </View>
+          <View className="row-start-1 row-end-4 bg-red-200 items-center justify-center">
+            <Text>03</Text>
+          </View>
+        </Grid>
+
+
+
+
+
+        <Text style={styles.sectionTitle}>17. Flex Justify Start</Text>
+        <Text style={styles.sectionDesc}>
+          <Text className="font-mono">justify-start</Text> & Starting and ending lines
+
+        </Text>
+        <View className="flex gap-2 justify-start flex-row">
+          <View className="bg-red-200">
+            <Text>01</Text>
+          </View>
+          <View className="bg-red-200">
+            <Text>02</Text>
+          </View>
+          <View className="bg-red-200">
+            <Text>03</Text>
+          </View>
+        </View>
+
+
+
+
+
+
+
+        <Text style={styles.sectionTitle}>18. Grid Justify Items Start</Text>
+        <Text style={styles.sectionDesc}>
+          <Text className="font-mono">justify-items-start</Text>
+        </Text>
+        <Grid className="grid justify-items-start grid-cols-3 gap-2 border-2 bg-red-200">
+          <View className="bg-red-200">
+            <Text>01</Text>
+          </View>
+          <View className="bg-red-200">
+            <Text>02</Text>
+          </View>
+          <View className="bg-red-200">
+            <Text>03</Text>
+          </View>
+          <View className="bg-red-200">
+            <Text>04</Text>
+          </View>
+          <View className="bg-red-200">
+            <Text>05</Text>
+          </View>
+          <View className="bg-red-200">
+            <Text>06</Text>
+          </View>
+        </Grid>
+
+
+
+
+        <Text style={styles.sectionTitle}>19. Grid Justify Items End</Text>
+        <Text style={styles.sectionDesc}>
+          <Text className="font-mono">justify-items-end</Text>
+        </Text>
+        <Grid className="grid justify-items-end grid-cols-3 gap-2 border-2 bg-white">
+          <View className="bg-red-200 flex-1 border-2">
+            <Text>01</Text>
+          </View>
+          <View className="bg-red-200">
+            <Text>02</Text>
+          </View>
+          <View className="bg-red-200">
+            <Text>03</Text>
+          </View>
+          <View className="bg-red-200">
+            <Text>04</Text>
+          </View>
+          <View className="bg-red-200">
+            <Text>05</Text>
+          </View>
+          <View className="bg-red-200">
+            <Text>06</Text>
+          </View>
+        </Grid>
+
+
+        {/* 20. Arbitrary Rows & Auto Flow */}
+        <Text style={styles.sectionTitle}>20. Arbitrary Rows</Text>
+        <Text style={styles.sectionDesc}>
+          <Text className="font-mono">grid-rows-[100px_1fr_80px]</Text> with explicit heights.
+        </Text>
+        <Grid className="grid grid-rows-[100px_1fr_80px] h-80 gap-4 bg-slate-100 p-4 rounded-xl mb-12">
+          <View className="bg-indigo-300 items-center justify-center rounded"><Text>Fixed 100px</Text></View>
+          <View className="bg-indigo-400 items-center justify-center rounded"><Text>Flex 1fr</Text></View>
+          <View className="bg-indigo-500 items-center justify-center rounded"><Text>Fixed 80px</Text></View>
+        </Grid>
+
+        {/* 21. Automatic Sizing (Implicit Grid) */}
+        <Text style={styles.sectionTitle}>21. Auto Cols/Rows (Implicit)</Text>
+        <Text style={styles.sectionDesc}>
+          <Text className="font-mono">auto-cols-[100px]</Text> defines size for items outside explicit columns.
+        </Text>
+        <Grid className="grid grid-cols-2 auto-cols-[120px] grid-flow-col gap-4 bg-slate-100 p-4 rounded-xl mb-12 overflow-scroll">
+          {/* Defined Cols */}
+          <View className="bg-emerald-300 h-20 items-center justify-center rounded"><Text>Col 1</Text></View>
+          <View className="bg-emerald-300 h-20 items-center justify-center rounded"><Text>Col 2</Text></View>
+          {/* Implicit Cols (should be 120px wide) */}
+          <View className="bg-orange-300 h-20 items-center justify-center rounded"><Text>Implicit 1</Text></View>
+          <View className="bg-orange-400 h-20 items-center justify-center rounded"><Text>Implicit 2</Text></View>
+          <View className="bg-orange-500 h-20 items-center justify-center rounded"><Text>Implicit 3</Text></View>
+        </Grid>
+
+        {/* 22. Kitchen Sink (Complex) */}
+        <Text style={styles.sectionTitle}>22. Kitchen Sink Grid</Text>
+        <Text style={styles.sectionDesc}>
+          Combining <Text className="font-mono">grid-areas</Text>, <Text className="font-mono">dense</Text> packing, and <Text className="font-mono">arbitrary values</Text>.
+        </Text>
+
+        <Grid
+          debug
+          className="grid grid-cols-4 gap-2 bg-slate-900 p-4 rounded-2xl mb-20"
+          style={{ height: 400 }}
+        >
+          {/* Header Area */}
+          <View className="col-span-4 bg-slate-800 p-4 rounded-lg flex-row justify-between items-center">
+            <Text className="text-white font-bold text-lg">Dashboard</Text>
+            <View className="bg-indigo-500 px-3 py-1 rounded-full"><Text className="text-white text-xs">Pro</Text></View>
+          </View>
+
+          {/* Sidebar (Row Span 2) */}
+          <View className="col-span-1 row-span-2 bg-slate-800 p-4 rounded-lg">
+            <View className="w-8 h-8 bg-slate-700 rounded-full mb-4" />
+            <View className="w-full h-2 bg-slate-700 rounded-full mb-2" />
+            <View className="w-2/3 h-2 bg-slate-700 rounded-full mb-2" />
+            <View className="w-3/4 h-2 bg-slate-700 rounded-full" />
+          </View>
+
+          {/* Main Content (Span 3) */}
+          <View className="col-span-3 bg-indigo-600 p-6 rounded-lg justify-center">
+            <Text className="text-white text-2xl font-black">Welcome Back</Text>
+            <Text className="text-indigo-200">Here is your daily overview.</Text>
+          </View>
+
+          {/* Stats Grid (Nested Subgrid-ish via flex) */}
+          <View className="col-span-3 flex-row gap-2">
+            <View className="flex-1 bg-slate-800 p-3 rounded-lg"><Text className="text-slate-400 text-xs">Views</Text><Text className="text-white font-bold text-xl">2.1k</Text></View>
+            <View className="flex-1 bg-slate-800 p-3 rounded-lg"><Text className="text-slate-400 text-xs">Likes</Text><Text className="text-white font-bold text-xl">842</Text></View>
+            <View className="flex-1 bg-emerald-900 p-3 rounded-lg"><Text className="text-emerald-400 text-xs">Sales</Text><Text className="text-emerald-400 font-bold text-xl">$1.2k</Text></View>
+          </View>
+
+          {/* Dense Filler (Standard Flex Items in Grid Cell) */}
+          <View className="col-span-4 bg-slate-800 p-2 rounded-lg flex-row gap-2 overflow-hidden">
+            {[1, 2, 3, 4, 5, 6, 7].map(i => (
+              <View key={i} className="w-10 h-10 bg-slate-700 rounded items-center justify-center">
+                <Text className="text-slate-500 font-bold">{i}</Text>
+              </View>
+            ))}
+          </View>
+        </Grid>
+
       </ScrollView>
-    </SafeAreaView>
+    </SafeAreaView >
   );
 }
 

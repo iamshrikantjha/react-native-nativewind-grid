@@ -23,10 +23,22 @@ Unlike other grid libraries that just wrap Flexbox, this library implements a **
 
 ## 📦 Installation
 
+### From NPM (Recommended)
+
 ```bash
 yarn add react-native-nativewind-grid
 # or
 npm install react-native-nativewind-grid
+```
+
+### Directly from GitHub (Bleeding Edge)
+
+You can install directly from the repository. The post-install `prepare` script will automatically build the library for you.
+
+```bash
+yarn add git+https://github.com/iamshrikantjha/react-native-nativewind-grid.git
+# or
+npm install git+https://github.com/iamshrikantjha/react-native-nativewind-grid.git
 ```
 
 ### ⚙️ Configuration (Crucial)
@@ -147,8 +159,9 @@ We aim for honest adherence to the spec, but React Native has differences from t
 1.  **Auto-Placement (Dense)**: `grid-flow-row-dense` is supported, but `grid-flow-column` logic is currently **experimental**.
 2.  **Subgrid**: `grid-cols-subgrid` is fully supported. `grid-rows-subgrid` is **not yet supported**.
 3.  **Explicit Tracks**: You must define tracks. `minmax(100px, 1fr)` syntax is **not yet supported** (planned). Use `auto` or `fr` instead.
-4.  **VirtualGrid Limitations**: `<VirtualGrid>` optimizes by pre-grouping items into rows. It assumes items mainly span 1 column. Complex variable spanning logic inside a virtualization context is restricted. Use standard `<Grid>` for highly irregular layouts with fewer (<100) items.
-5.  **Percentage Tracks**: Deeply nested percentage tracks sometimes resolve against the screen width rather than the immediate parent if the parent has no explicit width.
+4.  **Placement Ends**: `col-start` and `row-start` work perfectly. `col-end` and `row-end` are parsed but **currently ignored** by the layout engine (spans must be defined via `col-span`).
+5.  **VirtualGrid Limitations**: `<VirtualGrid>` optimizes by pre-grouping items into rows. It assumes items mainly span 1 column. Complex variable spanning logic inside a virtualization context is restricted. Use standard `<Grid>` for highly irregular layouts with fewer (<100) items.
+6.  **Percentage Tracks**: Deeply nested percentage tracks sometimes resolve against the screen width rather than the immediate parent if the parent has no explicit width.
 
 ## 🤝 Contributing
 

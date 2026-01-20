@@ -90,8 +90,11 @@
     "typescript": "^5.9.2"
   },
   "peerDependencies": {
+    "nativewind": ">=4.0.0",
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-reanimated": ">=3.0.0",
+    "react-native-safe-area-context": ">=4.0.0"
   },
   "workspaces": [
     "example"
