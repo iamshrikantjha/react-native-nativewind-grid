@@ -1,6 +1,6 @@
 /// <reference types="nativewind/types" />
 import React from 'react';
-import { View } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { parseGridClasses, parseItemClasses } from './parser';
 import { computeContainerStyle, computeItemStyle } from './calculator';
 import { computeMasonryLayout, computeGridLayout, type GridItem, type PlacedGridItem } from './layout';
@@ -26,12 +26,21 @@ export function Grid({
     // Memoize the grid spec parsing so it only runs when className changes
     const gridSpec = React.useMemo(() => {
         const spec = parseGridClasses(className);
+
+        // Extract container alignment from style (NativeWind consumes classes into style)
+        const flattenedStyle = StyleSheet.flatten(style);
+        if (flattenedStyle) {
+            if (flattenedStyle.alignContent) spec.alignContent = flattenedStyle.alignContent as any;
+            if (flattenedStyle.justifyContent) spec.justifyContent = flattenedStyle.justifyContent as any;
+            if (flattenedStyle.alignItems) spec.alignItems = flattenedStyle.alignItems as any;
+        }
+
         // Subgrid Resolution
         if (spec.cols === 'subgrid' && parentTracks) {
             spec.cols = parentTracks;
         }
         return spec;
-    }, [className, parentTracks]);
+    }, [className, parentTracks, style]);
 
     const containerStyle = React.useMemo(() => computeContainerStyle(gridSpec), [gridSpec]);
 
@@ -94,6 +103,15 @@ export function Grid({
             if (!React.isValidElement(child)) return { child, order: 0, itemSpec: null };
             const props = child.props as { className?: string; style?: any };
             const itemSpec = parseItemClasses(props.className);
+
+            // Extract alignSelf from style (NativeWind consumes classes into style)
+            const flattenedStyle = StyleSheet.flatten(props.style);
+            if (flattenedStyle?.alignSelf) {
+                // Map flex-start/end to our internal specs if needed, or pass through
+                // parser.ts maps 'start' -> 'flex-start', so 'flex-start' is valid.
+                itemSpec.alignSelf = flattenedStyle.alignSelf as any;
+            }
+
             return {
                 child,
                 order: itemSpec.order ?? 0,
@@ -341,7 +359,7 @@ export function Grid({
             const shouldStretchWidth = justify === 'stretch';
 
             // Block Axis (Height/Flex)
-            const align = itemSpec.alignSelf !== 'auto' ? itemSpec.alignSelf : (gridSpec.alignItems || 'stretch');
+            const align = (itemSpec.alignSelf && itemSpec.alignSelf !== 'auto') ? itemSpec.alignSelf : (gridSpec.alignItems || 'stretch');
             const shouldStretchHeight = align === 'stretch';
 
             // Clone child to force it to fill the cell IF STRETCH IS ACTIVE

@@ -6,8 +6,8 @@ import KitchenSink from './app/kitchen-sink';
 export default function App() {
   return (
     <View className="flex-1 bg-slate-100">
-      {/* <GridDemo /> */}
-      <KitchenSink />
+      <GridDemo />
+      {/* <KitchenSink /> */}
     </View>
   );
 }

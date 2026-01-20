@@ -166,7 +166,10 @@ const mapAlignContent = (val: string) => {
     case 'center': return 'center';
     case 'between': return 'space-between';
     case 'around': return 'space-around';
+    case 'evenly': return 'space-around'; // RN alignContent lacks space-evenly, fallback to around
     case 'stretch': return 'stretch';
+    case 'normal': return 'stretch';
+    case 'baseline': return 'flex-start';
     default: return undefined;
   }
 };

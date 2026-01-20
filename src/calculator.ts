@@ -267,5 +267,6 @@ export function computeItemStyle(
     flexDirection: 'column',
     alignItems: wrapperAlignItems,
     justifyContent: wrapperJustifyContent,
+    alignSelf: align as any,
   };
 }
