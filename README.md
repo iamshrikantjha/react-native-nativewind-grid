@@ -23,10 +23,22 @@ Unlike other grid libraries that just wrap Flexbox, this library implements a **
 
 ## 📦 Installation
 
+### From NPM (Recommended)
+
 ```bash
 yarn add react-native-nativewind-grid
 # or
 npm install react-native-nativewind-grid
+```
+
+### Directly from GitHub (Bleeding Edge)
+
+You can install directly from the repository. The post-install `prepare` script will automatically build the library for you.
+
+```bash
+yarn add git+https://github.com/iamshrikantjha/react-native-nativewind-grid.git
+# or
+npm install git+https://github.com/iamshrikantjha/react-native-nativewind-grid.git
 ```
 
 ### ⚙️ Configuration (Crucial)
